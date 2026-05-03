@@ -1,5 +1,5 @@
-// Teks doa Rosario dalam Bahasa Indonesia
-// Disusun mengikuti formula umum yang dipakai luas di Gereja Katolik Indonesia.
+// Teks doa Rosario dalam Bahasa Indonesia.
+// Susunan mengikuti tata doa Rosario yang lazim dipakai di Gereja Katolik Indonesia.
 
 export const PRAYERS = {
   "tanda-salib": {
@@ -47,12 +47,39 @@ export const PRAYERS = {
       "Kemuliaan kepada Bapa, dan Putera, dan Roh Kudus. " +
       "Seperti pada permulaan, sekarang, selalu, dan sepanjang segala abad. Amin.",
   },
-  "doa-fatima": {
-    id: "doa-fatima",
-    title: "Doa Fatima",
+  "terpujilah": {
+    id: "terpujilah",
+    title: "Terpujilah",
     text:
-      "Ya Yesus yang baik, ampunilah dosa-dosa kami. Selamatkanlah kami dari api neraka. " +
-      "Hantarkanlah jiwa-jiwa ke surga, terutama jiwa-jiwa yang sangat membutuhkan kerahiman-Mu. Amin.",
+      "Terpujilah nama Yesus, Maria, dan Santo Yosef. Sekarang dan selama-lamanya. Amin.",
+  },
+  // Tiga Salam Maria pembukaan — disertai intro yang berbeda.
+  "salam-putri": {
+    id: "salam-putri",
+    title: "Salam, Putri Allah Bapa",
+    intro: "Salam, Putri Allah Bapa.",
+    text:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
+      "doakanlah kami yang berdosa ini, sekarang dan waktu kami mati. Amin.",
+  },
+  "salam-bunda": {
+    id: "salam-bunda",
+    title: "Salam, Bunda Allah Putra",
+    intro: "Salam, Bunda Allah Putra.",
+    text:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
+      "doakanlah kami yang berdosa ini, sekarang dan waktu kami mati. Amin.",
+  },
+  "salam-mempelai": {
+    id: "salam-mempelai",
+    title: "Salam, Mempelai Allah Roh Kudus",
+    intro: "Salam, Mempelai Allah Roh Kudus.",
+    text:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
+      "doakanlah kami yang berdosa ini, sekarang dan waktu kami mati. Amin.",
   },
   "salam-ya-ratu": {
     id: "salam-ya-ratu",

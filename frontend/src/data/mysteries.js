@@ -1,5 +1,7 @@
-// Empat kelompok Peristiwa Rosario dalam Bahasa Indonesia
-// Renungan ditulis ringkas dan orisinal.
+// Empat kelompok Peristiwa Rosario dalam Bahasa Indonesia.
+// Setiap peristiwa memiliki:
+//   - leaderText (P):  teks yang dibacakan oleh Pemimpin (biasanya kutipan Kitab Suci + referensi).
+//   - responseText (P+U):  doa tanggapan yang diucapkan Pemimpin bersama Umat.
 
 export const MYSTERIES = [
   {
@@ -13,43 +15,48 @@ export const MYSTERIES = [
     events: [
       {
         order: 1,
-        title: "Maria Menerima Kabar dari Malaikat Gabriel",
+        title: "Maria menerima kabar gembira dari Malaikat Gabriel",
         scripture: "Lukas 1:26-38",
-        reflection:
-          "Maria dengan rendah hati berkata: 'Aku ini hamba Tuhan.' Dalam ketaatan-Nya, sejarah keselamatan dimulai.",
-        intention: "Semoga kami berani berkata 'ya' pada panggilan Tuhan dalam hidup kami.",
+        leaderText:
+          "Salam, hai engkau yang dikaruniai, Tuhan menyertai engkau. Jangan takut, hai Maria, sebab engkau beroleh kasih karunia di hadapan Allah. Sesungguhnya engkau akan mengandung dan akan melahirkan seorang anak laki-laki dan hendaklah engkau menamai Dia Yesus.",
+        responseText:
+          "Bapa, jika Engkau bersabda maka semuanya terjadi. Bersabdalah ya Bapa, aku ini adalah hamba-Mu. Terjadilah padaku menurut kehendak-Mu.",
       },
       {
         order: 2,
-        title: "Maria Mengunjungi Elisabet",
-        scripture: "Lukas 1:39-56",
-        reflection:
-          "Maria bergegas pergi melayani Elisabet. Cinta sejati selalu mendorong kita untuk peduli pada sesama.",
-        intention: "Semoga kami peka melihat kebutuhan saudara dan saudari di sekitar kami.",
+        title: "Maria mengunjungi Elisabeth",
+        scripture: "Lukas 1:42-43",
+        leaderText:
+          "Diberkatilah engkau di antara semua perempuan dan diberkatilah buah rahimmu. Siapakah aku ini sampai ibu Tuhanku datang mengunjungi aku?",
+        responseText:
+          "Bapa, hatiku memuliakan Dikau dan jiwaku bersorak-sorai, karena Engkau Allah penuh kasih. Engkau menciptakan dan memelihara kami, anak-anak-Mu.",
       },
       {
         order: 3,
-        title: "Yesus Dilahirkan di Betlehem",
-        scripture: "Lukas 2:1-20",
-        reflection:
-          "Sang Putera Allah lahir dalam kemiskinan kandang. Allah memilih kesederhanaan untuk menyatakan diri.",
-        intention: "Semoga kami menemukan Tuhan dalam hal-hal kecil dan sederhana setiap hari.",
+        title: "Yesus dilahirkan di Betlehem",
+        scripture: "Lukas 2:7",
+        leaderText:
+          "Maria melahirkan seorang anak laki-laki... Lalu dibungkusnya dengan kain lampin dan dibaringkannya di dalam palungan, karena tidak ada tempat bagi mereka di rumah penginapan.",
+        responseText:
+          "Bapa, kami bersyukur karena Engkau telah merelakan Putra-Mu menjadi manusia demi menebus dan mengampuni dosa-dosa kami. Jadikanlah kami layak menjadi anak-anak-Mu.",
       },
       {
         order: 4,
-        title: "Yesus Dipersembahkan di Bait Allah",
-        scripture: "Lukas 2:22-40",
-        reflection:
-          "Yusuf dan Maria mempersembahkan Yesus kepada Bapa. Hidup yang dipersembahkan adalah hidup yang berbuah.",
-        intention: "Semoga kami mempersembahkan hidup, keluarga, dan pekerjaan kami kepada Tuhan.",
+        title: "Yesus dipersembahkan dalam Bait Allah",
+        scripture: "Lukas 2:34-35",
+        leaderText:
+          "Simeon berkata kepada Maria: “Sesungguhnya Anak ini ditentukan untuk menjatuhkan atau membangkitkan banyak orang di Israel dan untuk menjadi suatu tanda yang menimbulkan perbantahan. Kelak suatu pedang akan menembus jiwamu sendiri.”",
+        responseText:
+          "Bapa, kami mempersembahkan segenap diri kami kepada-Mu. Terimalah kami sebagai persembahan yang layak, demi jasa Putera-Mu, Juruselamat kami.",
       },
       {
         order: 5,
-        title: "Yesus Ditemukan di Bait Allah",
-        scripture: "Lukas 2:41-52",
-        reflection:
-          "Yesus berkata: 'Aku harus berada di rumah Bapa-Ku.' Mencari Tuhan sering berarti mencari-Nya kembali setiap hari.",
-        intention: "Semoga kami tekun mencari Yesus dalam doa, sabda, dan Ekaristi.",
+        title: "Yesus ditemukan dalam Bait Allah",
+        scripture: "Lukas 2:49-50",
+        leaderText:
+          "“Mengapa kamu mencari Aku? Tidakkah kamu tahu, bahwa Aku harus berada di dalam rumah Bapa-Ku?” Tetapi mereka tidak mengerti apa yang dikatakan-Nya kepada mereka.",
+        responseText:
+          "Bapa, Putra-Mu sepenuhnya hidup demi kemuliaan-Mu dan keselamatan kami. Bentuklah kami menjadi serupa dengan Putra-Mu.",
       },
     ],
   },
@@ -64,43 +71,48 @@ export const MYSTERIES = [
     events: [
       {
         order: 1,
-        title: "Yesus Berdoa di Taman Getsemani",
-        scripture: "Matius 26:36-46",
-        reflection:
-          "Dalam ketakutan-Nya, Yesus tetap berserah: 'Bukan kehendak-Ku, melainkan kehendak-Mu.'",
-        intention: "Semoga kami tetap setia berdoa di tengah kecemasan dan pergumulan hidup.",
+        title: "Yesus berdoa kepada Bapa-Nya dalam sakratul maut",
+        scripture: "Matius 26:39",
+        leaderText:
+          "“Ya Bapa-Ku, jikalau Engkau berkenan, ambillah cawan ini dari hadapan-Ku, tetapi janganlah menurut kehendak-Ku, melainkan kehendak-Mu yang terjadi.”",
+        responseText:
+          "Bapa, ajarilah kami selalu mengikuti kehendak-Mu pada saat kami dicobai. Engkau pasti menyertai kami sebagai Bapa, karena Engkau sangat menyayangi kami.",
       },
       {
         order: 2,
-        title: "Yesus Didera",
-        scripture: "Yohanes 19:1",
-        reflection:
-          "Tubuh-Nya disiksa demi pemulihan kita. Setiap luka-Nya adalah tanda cinta yang tak terbatas.",
-        intention: "Semoga kami menghargai tubuh kami sebagai bait Roh Kudus.",
+        title: "Yesus didera",
+        scripture: "Markus 15:19-20",
+        leaderText:
+          "Mereka memukul kepala-Nya dengan buluh, dan meludahi-Nya dan berlutut menyembah-Nya. Sesudah mengolok-olokkan Dia, mereka menanggalkan jubah ungu yang dipakai-Nya dan mengenakan lagi pakaian-Nya.",
+        responseText:
+          "Bapa, berilah kami rahmat untuk selalu mengingat sengsara-Mu, agar kami dapat berdiri teguh dan memikul salib dengan kasih.",
       },
       {
         order: 3,
-        title: "Yesus Dimahkotai Duri",
-        scripture: "Matius 27:27-31",
-        reflection:
-          "Sang Raja kemuliaan dihinakan dengan mahkota duri. Cinta sejati siap dipermalukan demi yang dicintai.",
-        intention: "Semoga kami sabar menanggung kesalahpahaman dan penghinaan.",
+        title: "Yesus dimahkotai duri",
+        scripture: "Markus 15:17-18",
+        leaderText:
+          "Mereka menganyam sebuah mahkota duri dan menaruh di atas kepala-Nya. Kemudian mereka mulai memberi hormat kepada-Nya, katanya: “Salam, hai raja orang Yahudi!”",
+        responseText:
+          "Bapa, Putra-Mu dimahkotai duri, tetapi Ia tidak pernah membenci algojonya. Ajarilah kami mengampuni dan memberkati sesama kami.",
       },
       {
         order: 4,
-        title: "Yesus Memanggul Salib",
-        scripture: "Lukas 23:26-32",
-        reflection:
-          "Beban salib menjadi jalan keselamatan. Setiap salib yang kita panggul, jika dipersembahkan, ikut menyelamatkan.",
-        intention: "Semoga kami memanggul salib hidup harian dengan iman dan harapan.",
+        title: "Yesus memanggul salib-Nya ke Gunung Kalvari",
+        scripture: "Yohanes 19:16b",
+        leaderText:
+          "Sambil memikul salib-Nya, Ia pergi keluar ke tempat yang bernama tempat tengkorak, yang dalam bahasa Ibrani disebut Golgota.",
+        responseText:
+          "Bapa, ajarilah kami memikul salib kehidupan ini tanpa mengeluh dan dengan penuh iman, supaya kami sungguh serupa dengan Yesus, Putra-Mu sendiri.",
       },
       {
         order: 5,
-        title: "Yesus Wafat di Salib",
-        scripture: "Lukas 23:33-46",
-        reflection:
-          "'Sudah selesai.' Kasih Allah kepada kita ditandai dengan penyerahan total Putera-Nya.",
-        intention: "Semoga kami hidup pantas untuk kasih sebesar itu.",
+        title: "Yesus wafat di salib",
+        scripture: "Lukas 23:46",
+        leaderText:
+          "Yesus berseru dengan suara nyaring: “Ya Bapa, ke dalam tangan-Mu Kuserahkan nyawa-Ku.” Sesudah berkata demikian Ia menyerahkan nyawa-Nya.",
+        responseText:
+          "Bapa, hadirlah dekat kami bersama Putra dan Roh-Mu pada saat kami menghadapi kematian, dan terimalah kami dalam kerajaan kasih-Mu yang kekal.",
       },
     ],
   },
@@ -115,43 +127,48 @@ export const MYSTERIES = [
     events: [
       {
         order: 1,
-        title: "Yesus Bangkit dari Antara Orang Mati",
-        scripture: "Matius 28:1-10",
-        reflection:
-          "Maut tidak berkuasa atas Kristus. Dalam Dia, harapan kita tidak pernah sia-sia.",
-        intention: "Semoga kami hidup sebagai orang yang dibangkitkan dalam kasih Kristus.",
+        title: "Yesus bangkit dari antara orang mati",
+        scripture: "Matius 28:5-6",
+        leaderText:
+          "Malaikat itu berkata: “Janganlah kamu takut, sebab aku tahu kamu mencari Yesus yang disalibkan itu. Ia tidak di sini, sebab Ia telah bangkit, sama seperti yang telah dikatakan-Nya.”",
+        responseText:
+          "Bapa, mampukanlah kami melanjutkan misi Putra-Mu yaitu memberitakan Injil kepada semua orang agar kerajaan-Mu menjadi nyata di bumi ini.",
       },
       {
         order: 2,
-        title: "Yesus Naik ke Surga",
-        scripture: "Kisah Para Rasul 1:6-11",
-        reflection:
-          "Yesus tidak meninggalkan kita; Ia mendahului kita ke rumah Bapa.",
-        intention: "Semoga hati kami terarah pada perkara surgawi tanpa meninggalkan tugas dunia.",
+        title: "Yesus naik ke surga",
+        scripture: "Kisah Para Rasul 1:9-11",
+        leaderText:
+          "Sesudah Ia mengatakan demikian, Ia diangkat ke surga disaksikan oleh mereka, dan awan menutup-Nya dari pandangan mereka. “Hai orang Galilea, mengapa kamu berdiri melihat ke langit? Yesus ini yang diangkat ke surga meninggalkan kamu, akan kembali dengan cara yang sama seperti kamu melihat Dia naik ke surga.”",
+        responseText:
+          "Bapa, Engkau tumpuan hidup dan harapan kami. Tanamkanlah dalam diri kami keyakinan bahwa Engkau menyertai kami selalu hingga akhir zaman.",
       },
       {
         order: 3,
-        title: "Roh Kudus Turun atas Para Rasul",
-        scripture: "Kisah Para Rasul 2:1-13",
-        reflection:
-          "Roh Kudus mengubah ketakutan menjadi keberanian dan kebisuan menjadi pewartaan.",
-        intention: "Semoga Roh Kudus memperbarui Gereja dan keluarga-keluarga Kristiani.",
+        title: "Roh Kudus turun atas para Rasul",
+        scripture: "Kisah Para Rasul 2:2,4",
+        leaderText:
+          "Tiba-tiba terdengarlah bunyi dari langit seperti tiupan angin keras yang memenuhi seluruh rumah di mana mereka duduk... Lalu mereka semua dipenuhi Roh Kudus dan mulai berbicara dalam bahasa lain, seperti yang diberikan oleh Roh itu kepada mereka untuk dikatakan.",
+        responseText:
+          "Bapa, semoga Roh Kudus-Mu membimbing hidup kami dalam kasih dan kebenaran-Mu, serta menjadikan kami layak di hadapan-Mu.",
       },
       {
         order: 4,
-        title: "Maria Diangkat ke Surga",
-        scripture: "Wahyu 12:1",
-        reflection:
-          "Bunda yang setia diangkat dengan jiwa dan badan. Ini adalah jaminan akan tujuan akhir kita.",
-        intention: "Semoga kami berziarah dengan setia menuju rumah Bapa.",
+        title: "Maria diangkat ke surga",
+        scripture: "1 Tesalonika 4:14,17",
+        leaderText:
+          "Jikalau kita percaya bahwa Yesus telah mati dan telah bangkit, maka kita percaya juga bahwa dengan perantaraan Yesus, Allah akan mengumpulkan bersama-sama dengan Dia mereka yang telah meninggal. Sesudah itu kita yang hidup, yang masih tinggal, akan diangkat bersama-sama dengan mereka dalam awan menyongsong Tuhan di angkasa. Demikianlah kita akan selama-lamanya bersama-sama dengan Tuhan.",
+        responseText:
+          "Bapa, berilah kami iman yang hidup, dan jadikanlah kami saksi-Mu di hadapan sesama kami.",
       },
       {
         order: 5,
-        title: "Maria Dimahkotai di Surga",
+        title: "Maria dimahkotai di surga",
         scripture: "Wahyu 12:1",
-        reflection:
-          "Maria, Ratu surga dan bumi, mendoakan kami yang berziarah di dunia ini.",
-        intention: "Semoga doa Bunda Maria menyertai kami sampai akhir hidup.",
+        leaderText:
+          "Tampaklah suatu tanda besar di langit, seorang perempuan berselubungkan matahari, dengan bulan di bawah kakinya dan sebuah mahkota dari dua belas bintang di atas kepalanya.",
+        responseText:
+          "Bapa, satu-satunya sumber kasih sejati, kobarkanlah dalam diri kami semangat kasih-Mu kepada Bunda Putra-Mu, sebab kami memandangnya sebagai teladan pengikut Yesus.",
       },
     ],
   },
@@ -166,43 +183,48 @@ export const MYSTERIES = [
     events: [
       {
         order: 1,
-        title: "Yesus Dibaptis di Sungai Yordan",
-        scripture: "Matius 3:13-17",
-        reflection:
-          "Dalam pembaptisan-Nya, Yesus menunjukkan kerendahan hati dan ketaatan kepada Bapa.",
-        intention: "Semoga kami setia pada panggilan baptis kami.",
+        title: "Yesus dibaptis di Sungai Yordan",
+        scripture: "Matius 3:16-17",
+        leaderText:
+          "Sesudah dibaptis, Yesus segera keluar dari air dan pada waktu itu juga langit terbuka dan Ia melihat Roh Allah seperti burung merpati turun ke atas-Nya, lalu terdengarlah suara dari surga yang mengatakan: “Inilah Anak-Ku yang terkasih, kepada-Nya Aku berkenan.”",
+        responseText:
+          "Bapa, kami pun Engkau beri misi sebagai anak-Mu dan pengikut Yesus. Buatlah kami menerima tugas itu dengan hati terbuka dan penuh sukacita.",
       },
       {
         order: 2,
-        title: "Yesus Menyatakan Diri di Pesta Kana",
-        scripture: "Yohanes 2:1-12",
-        reflection:
-          "Atas permohonan Bunda-Nya, Yesus mengubah air menjadi anggur. Doa Maria efektif bagi kita.",
-        intention: "Semoga keluarga-keluarga menemukan Yesus melalui perantaraan Maria.",
+        title: "Yesus menyatakan diri-Nya dalam pesta pernikahan di Kana",
+        scripture: "Yohanes 2:11",
+        leaderText:
+          "Atas permintaan Maria bunda-Nya, Yesus mengatasi kekurangan anggur. Hal itu dilakukan Yesus sebagai yang pertama dari tanda-tanda-Nya dan dengan itu Ia telah menyatakan kemuliaan-Nya dan murid-murid-Nya percaya kepada-Nya.",
+        responseText:
+          "Bapa, tolonglah kami mampu menghadapi setiap masalah hidup ini dengan tenang sambil mengandalkan kasih-Mu kepada kami.",
       },
       {
         order: 3,
-        title: "Yesus Memberitakan Kerajaan Allah",
-        scripture: "Markus 1:14-15",
-        reflection:
-          "Pertobatan adalah pintu masuk ke Kerajaan. Tidak ada hari yang terlambat untuk kembali kepada Tuhan.",
-        intention: "Semoga kami bertobat setiap hari dan membawa damai pada dunia.",
+        title: "Yesus memberitakan Kerajaan Allah dan menyerukan pertobatan",
+        scripture: "Matius 4:17,23",
+        leaderText:
+          "“Bertobatlah, sebab Kerajaan Surga sudah dekat!” Yesus pun berkeliling di seluruh Galilea, Ia mengajar dalam rumah-rumah ibadat dan memberitakan Injil Kerajaan Surga serta menyembuhkan orang-orang di antara bangsa itu.",
+        responseText:
+          "Bapa, pertobatkanlah kami, ampunilah dosa kami. Jadikanlah kami mampu mengampuni orang yang telah menyakiti kami.",
       },
       {
         order: 4,
-        title: "Yesus Menampakkan Kemuliaan-Nya",
-        scripture: "Matius 17:1-8",
-        reflection:
-          "Di Gunung Tabor, wajah-Nya bersinar. Saat-saat 'puncak' rohani menguatkan kami untuk turun ke lembah.",
-        intention: "Semoga kami menyimpan rahmat doa untuk menghadapi hari-hari sulit.",
+        title: "Yesus menampakkan kemuliaan-Nya",
+        scripture: "Matius 17:2,5",
+        leaderText:
+          "Yesus berubah rupa di sebuah gunung yang tinggi, wajah-Nya bercahaya seperti matahari. Allah bersabda kepada tiga Rasul Yesus, “Inilah Anak-Ku yang terkasih, kepada-Nyalah Aku berkenan, dengarkanlah Dia.”",
+        responseText:
+          "Bapa, ajarilah kami mendengarkan Yesus dan sepenuhnya menerima ajaran-Nya. Izinkanlah kami semakin mengenal Dia, terutama dalam sengsara-Nya.",
       },
       {
         order: 5,
-        title: "Yesus Menetapkan Ekaristi",
-        scripture: "Lukas 22:14-20",
-        reflection:
-          "Pada perjamuan terakhir, Yesus memberi diri-Nya sebagai Roti hidup. Kasih yang menyerahkan diri secara total.",
-        intention: "Semoga kami menyambut Ekaristi dengan iman dan rasa syukur.",
+        title: "Yesus menetapkan Ekaristi",
+        scripture: "Markus 14:22-24",
+        leaderText:
+          "Yesus mengambil roti, mengucap syukur, memecah-mecahkannya lalu memberikannya kepada mereka dan berkata: “Ambillah, inilah tubuh-Ku.” Sesudah itu Ia mengambil cawan, mengucap syukur lalu memberikannya kepada mereka. Ia berkata: “Inilah darah-Ku yang ditumpahkan bagi banyak orang.”",
+        responseText:
+          "Bapa, sucikan dan kuduskanlah kami pada saat kami menerima Tubuh dan Darah Putra-Mu yang terkasih. Pakailah kami seturut kehendak-Mu.",
       },
     ],
   },

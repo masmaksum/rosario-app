@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, Pause } from "lucide-react";
 import { getMysteryById } from "../data/mysteries";
-import { buildRosarySteps, getPrayerForStep } from "../utils/rosaryFlow";
+import { buildRosarySteps, getPrayerForStep, DECADE_END_PRAYER_ID } from "../utils/rosaryFlow";
 import { useProgress } from "../context/ProgressContext";
 import { useSettings } from "../context/SettingsContext";
 import RosaryVisualizer from "../components/RosaryVisualizer";
@@ -59,7 +59,7 @@ export default function PrayPage() {
   let lastFinished = -1;
   for (let i = 0; i < idx; i++) {
     const s = steps[i];
-    if (s && s.prayerId === "doa-fatima" && s.decadeIndex != null) {
+    if (s && s.prayerId === DECADE_END_PRAYER_ID && s.decadeIndex != null) {
       if (s.decadeIndex > lastFinished) lastFinished = s.decadeIndex;
     }
   }
@@ -127,6 +127,11 @@ export default function PrayPage() {
             <h2 className="font-serif-display text-3xl text-primary">
               {prayer.title}
             </h2>
+            {prayer.intro && (
+              <p className="mt-3 italic text-muted-foreground" data-testid="prayer-intro">
+                {prayer.intro}
+              </p>
+            )}
             <p
               className="mt-6 leading-relaxed text-foreground/90 whitespace-pre-line"
               style={{ fontSize: "1.125rem" }}
@@ -153,12 +158,26 @@ export default function PrayPage() {
             <p className="text-center text-sm text-muted-foreground mt-2">
               {step.scripture}
             </p>
-            <p className="mt-6 leading-relaxed">{step.reflection}</p>
-            <div className="mt-6 rounded-2xl border border-accent/40 bg-accent/10 p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-accent-foreground/80 mb-1">
-                Intensi
+
+            {/* P (Pemimpin) */}
+            <div className="mt-6" data-testid="reflection-leader">
+              <p className="text-xs font-semibold tracking-wider text-primary/80 mb-1">
+                P
               </p>
-              <p className="leading-relaxed">{step.intention}</p>
+              <p className="leading-relaxed text-foreground/90">
+                {step.leaderText}
+              </p>
+            </div>
+
+            {/* P + U (Pemimpin + Umat) */}
+            <div
+              className="mt-6 rounded-2xl border border-accent/40 bg-accent/10 p-4"
+              data-testid="reflection-response"
+            >
+              <p className="text-xs font-semibold tracking-wider text-accent-foreground/80 mb-1">
+                P + U
+              </p>
+              <p className="leading-relaxed">{step.responseText}</p>
             </div>
           </article>
         )}

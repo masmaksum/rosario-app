@@ -1,74 +1,57 @@
 // Build the full step-by-step Rosary flow given a selected mystery.
-// Each step is an object describing what the user prays at that screen.
+// Alur mengikuti tata doa Rosario yang lazim di Gereja Katolik Indonesia:
+//
+//   Pembukaan:
+//     1. Tanda Salib
+//     2. Aku Percaya
+//     3. Kemuliaan
+//     4. Bapa Kami
+//     5. Salam Putri Allah Bapa     (+ Salam Maria)
+//     6. Salam Bunda Allah Putra    (+ Salam Maria)
+//     7. Salam Mempelai Allah Roh Kudus (+ Salam Maria)
+//     8. Kemuliaan
+//     9. Terpujilah
+//
+//   Setiap Peristiwa (×5):
+//     10. Peristiwa — teks Kitab Suci (P) + doa tanggapan (P + U)
+//     11. Bapa Kami
+//     12. 10× Salam Maria
+//     13. Kemuliaan
+//     14. Terpujilah
+//
+//   Penutup:
+//     15. Doa Penutup
+//     16. Tanda Salib
+//
+//   + 1 halaman Selesai.
 
 import { PRAYERS } from "../data/prayers";
 
-/**
- * Step types:
- *  - "prayer": shows a single prayer (title + text)
- *  - "reflection": shows mystery title + scripture + reflection + intention (for the start of each decade)
- *  - "complete": final completion screen
- *
- * Each step also carries:
- *   - decadeIndex (0-4) when inside a decade, otherwise null
- *   - hailMaryIndex (1-10) when it's a Hail Mary inside a decade, otherwise null
- *   - mysteryEventOrder (1-5) for reflection screens
- *   - label: short label shown to user ("Tanda Salib", "Salam Maria 6 dari 10", etc.)
- */
-
 export function buildRosarySteps(mystery) {
   const steps = [];
+  const none = { decadeIndex: null, hailMaryIndex: null };
 
-  // Opening
-  steps.push({
-    type: "prayer",
-    prayerId: "tanda-salib",
-    label: "Pembukaan",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
-  steps.push({
-    type: "prayer",
-    prayerId: "aku-percaya",
-    label: "Pembukaan",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
-  steps.push({
-    type: "prayer",
-    prayerId: "bapa-kami",
-    label: "Pembukaan",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
-  // 3 Hail Marys for faith, hope, charity
-  for (let i = 1; i <= 3; i++) {
-    steps.push({
-      type: "prayer",
-      prayerId: "salam-maria",
-      label: `Salam Maria Pembukaan (${i}/3)`,
-      decadeIndex: null,
-      hailMaryIndex: null,
-    });
-  }
-  steps.push({
-    type: "prayer",
-    prayerId: "kemuliaan",
-    label: "Pembukaan",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
+  // ====== Pembukaan ======
+  steps.push({ type: "prayer", prayerId: "tanda-salib", label: "Pembukaan", ...none });
+  steps.push({ type: "prayer", prayerId: "aku-percaya", label: "Pembukaan", ...none });
+  steps.push({ type: "prayer", prayerId: "kemuliaan", label: "Pembukaan", ...none });
+  steps.push({ type: "prayer", prayerId: "bapa-kami", label: "Pembukaan", ...none });
+  steps.push({ type: "prayer", prayerId: "salam-putri", label: "Salam Pembukaan 1 / 3", ...none });
+  steps.push({ type: "prayer", prayerId: "salam-bunda", label: "Salam Pembukaan 2 / 3", ...none });
+  steps.push({ type: "prayer", prayerId: "salam-mempelai", label: "Salam Pembukaan 3 / 3", ...none });
+  steps.push({ type: "prayer", prayerId: "kemuliaan", label: "Pembukaan", ...none });
+  steps.push({ type: "prayer", prayerId: "terpujilah", label: "Pembukaan", ...none });
 
-  // 5 decades
+  // ====== 5 Peristiwa ======
   mystery.events.forEach((event, idx) => {
-    // Reflection screen
+    // Halaman Peristiwa (Pemimpin + Umat)
     steps.push({
       type: "reflection",
       mysteryEventOrder: event.order,
       eventTitle: event.title,
       scripture: event.scripture,
-      reflection: event.reflection,
-      intention: event.intention,
+      leaderText: event.leaderText,
+      responseText: event.responseText,
       label: `Peristiwa ${event.order} dari 5`,
       decadeIndex: idx,
       hailMaryIndex: null,
@@ -81,7 +64,7 @@ export function buildRosarySteps(mystery) {
       decadeIndex: idx,
       hailMaryIndex: null,
     });
-    // 10 Hail Marys
+    // 10× Salam Maria
     for (let i = 1; i <= 10; i++) {
       steps.push({
         type: "prayer",
@@ -99,46 +82,22 @@ export function buildRosarySteps(mystery) {
       decadeIndex: idx,
       hailMaryIndex: null,
     });
-    // Doa Fatima
+    // Terpujilah (penanda akhir dekade)
     steps.push({
       type: "prayer",
-      prayerId: "doa-fatima",
-      label: `Peristiwa ${event.order} — Doa Fatima`,
+      prayerId: "terpujilah",
+      label: `Peristiwa ${event.order} — Terpujilah`,
       decadeIndex: idx,
       hailMaryIndex: null,
     });
   });
 
-  // Closing
-  steps.push({
-    type: "prayer",
-    prayerId: "salam-ya-ratu",
-    label: "Penutup",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
-  steps.push({
-    type: "prayer",
-    prayerId: "doa-penutup",
-    label: "Penutup",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
-  steps.push({
-    type: "prayer",
-    prayerId: "tanda-salib",
-    label: "Penutup",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
+  // ====== Penutup ======
+  steps.push({ type: "prayer", prayerId: "doa-penutup", label: "Penutup", ...none });
+  steps.push({ type: "prayer", prayerId: "tanda-salib", label: "Penutup", ...none });
 
-  // Completion
-  steps.push({
-    type: "complete",
-    label: "Selesai",
-    decadeIndex: null,
-    hailMaryIndex: null,
-  });
+  // ====== Selesai ======
+  steps.push({ type: "complete", label: "Selesai", ...none });
 
   return steps;
 }
@@ -147,3 +106,7 @@ export function getPrayerForStep(step) {
   if (!step || step.type !== "prayer") return null;
   return PRAYERS[step.prayerId];
 }
+
+// Penanda langkah terakhir suatu dekade (untuk perhitungan completedDecades):
+// dekade dianggap selesai ketika "terpujilah" pada dekade tersebut telah dilewati.
+export const DECADE_END_PRAYER_ID = "terpujilah";
