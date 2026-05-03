@@ -1,0 +1,106 @@
+{
+  "project_name": "Aplikasi Berdoa Rosario",
+  "theme": "Light & Dark (Context-Aware)",
+  "archetype": "Archetype 1: Organic & Earthy (Adapted to Serene Devotional)",
+  "emotion_and_tone": "Reverent, calm, contemplative, structured, accessible.",
+  "typography": {
+    "fonts": {
+      "heading": "Cormorant Garamond, serif",
+      "body": "Manrope, sans-serif"
+    },
+    "scale_and_hierarchy": {
+      "h1": "text-4xl sm:text-5xl tracking-tight leading-none",
+      "h2": "text-3xl sm:text-4xl tracking-tight",
+      "h3": "text-2xl",
+      "body_base": "text-lg",
+      "overline": "text-sm uppercase tracking-[0.2em] font-semibold"
+    },
+    "accessibility_dynamic_scaling": {
+      "description": "App must support 4 font size modes to accommodate elderly users.",
+      "small": "base scale (html font-size: 14px)",
+      "medium": "base scale (html font-size: 16px - DEFAULT)",
+      "large": "base scale (html font-size: 18px)",
+      "extraLarge": "base scale (html font-size: 20px)"
+    }
+  },
+  "colors": {
+    "light_mode": {
+      "background": "#F9F6F0",
+      "surface": "#FFFFFF",
+      "primary_marian_blue": "#2B4C7E",
+      "accent_gold": "#D4AF37",
+      "text_main": "#1A2530",
+      "text_muted": "#5C6B7B",
+      "border": "#E5E0D8"
+    },
+    "dark_mode": {
+      "background": "#0B1320",
+      "surface": "#121E30",
+      "primary_marian_blue": "#4A70A6",
+      "accent_gold": "#E6C27A",
+      "text_main": "#FDFBF7",
+      "text_muted": "#A0B0C0",
+      "border": "#1E2D40"
+    }
+  },
+  "layout_and_spacing": {
+    "strategy": "Mobile-first, single-column focus. The app is a spiritual companion, not a dashboard.",
+    "container": "max-w-md mx-auto min-h-screen relative shadow-2xl bg-background text-text_main",
+    "spacing_scale": "Use generous padding: p-6 or p-8 for main sections. Allow content to breathe.",
+    "tap_targets": "CRITICAL: All buttons must have a minimum height of 56px (h-14) for elderly accessibility."
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#2B4C7E] dark:bg-[#4A70A6] text-white rounded-2xl h-14 px-6 text-lg font-medium shadow-md flex items-center justify-center gap-3 active:scale-95 transition-transform",
+      "secondary": "bg-transparent border-2 border-[#2B4C7E] dark:border-[#4A70A6] text-[#2B4C7E] dark:text-[#4A70A6] rounded-2xl h-14 px-6 text-lg font-medium active:scale-95 transition-transform"
+    },
+    "cards": {
+      "mystery_card": "relative overflow-hidden rounded-3xl p-6 bg-surface shadow-sm border border-border transition-all duration-300 active:scale-95"
+    },
+    "rosary_visualizer": {
+      "description": "Visual progress indicator showing 10 beads per decade and larger separation beads.",
+      "inactive_bead": "w-4 h-4 rounded-full bg-border/50 border border-border transition-all duration-500",
+      "active_bead": "w-5 h-5 rounded-full bg-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.6)] transition-all duration-500",
+      "completed_bead": "w-4 h-4 rounded-full bg-[#2B4C7E] opacity-80 transition-all duration-500"
+    },
+    "shadcn_usage": "Use Shadcn Dialog for Intentions CRUD, Select for Font Size, Switch for Dark Mode. Heavily style them to remove 'tech' borders and make them soft and rounded to match the organic tone."
+  },
+  "motion_and_interaction": {
+    "transitions": "Slow, contemplative. Use duration-500 or duration-700 ease-in-out for page transitions and fade-ins. Avoid bouncing or spring animations.",
+    "haptic_feedback": "Recommend adding a subtle vibration (navigator.vibrate) when moving to the next bead/step.",
+    "hover_states": "Since target is touch/mobile, focus on active/press states (scale-95, bg-darken) rather than hover."
+  },
+  "media_and_images": {
+    "instructions": "Use these generated images for hero sections, splash screens, or subtle background textures with heavy opacity overlays.",
+    "images": [
+      {
+        "category": "background_abstract",
+        "url": "https://static.prod-images.emergentagent.com/jobs/5058219d-de7a-42c5-8fae-9cafb178e434/images/b65f5dbfb1cd9b1d505510df6723d45d0f7220c5d66ef16c68a4438e3b136aeb.png",
+        "description": "Minimalist Marian blue and cream abstract gradient. Use as a subtle background for the Home or Completion screen with a heavy fade/overlay to keep text readable."
+      },
+      {
+        "category": "hero_visual",
+        "url": "https://static.prod-images.emergentagent.com/jobs/5058219d-de7a-42c5-8fae-9cafb178e434/images/7e1e7f0489b9530fb6c2d0653c6375b669debc5bbccd41dbde8460ec2061ee31.png",
+        "description": "Close up of physical rosary beads. Excellent for a splash screen or the background of the 'Pilih Peristiwa' cards."
+      },
+      {
+        "category": "spiritual_accent",
+        "url": "https://static.prod-images.emergentagent.com/jobs/5058219d-de7a-42c5-8fae-9cafb178e434/images/ccaca84f89898647bfb225235132afa450de47fb89e8a6d85e6f1ddb2c11f072.png",
+        "description": "Divine light rays. Use as a header background for the active prayer view, overlaid with a strong gradient to maintain text readability."
+      }
+    ]
+  },
+  "accessibility_and_testing": {
+    "contrast": "Ensure all text against colored backgrounds meets WCAG AA standards. Use text-shadow if overlaid on the generated images.",
+    "testing_attributes": "Add data-testid to ALL interactive elements (e.g., data-testid='next-bead-button', data-testid='mystery-joyful-card').",
+    "screen_reader": "Include aria-labels for the rosary visualizer, describing the current bead number and mystery."
+  },
+  "instructions_to_main_agent": [
+    "1. Setup standard React + Vite + Tailwind + Shadcn.",
+    "2. Implement a global Font Size context/provider. Provide an interface to toggle between 4 sizes (small, medium, large, extraLarge). Use CSS variables to scale typography throughout the app to cater to elderly users.",
+    "3. Build the Offline PWA manifest and service worker config to allow offline praying.",
+    "4. For the 'Doa' page, manage state for the current bead/step (1 to 50+). Persist this state to localStorage so progress resumes if the app is closed.",
+    "5. Build a custom RosaryVisualizer component (SVG or flexbox circles) that reacts to the current bead state.",
+    "6. Build the Intentions CRUD using a simple localStorage array."
+  ]
+}
