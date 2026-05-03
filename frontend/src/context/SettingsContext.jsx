@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 
 const SettingsContext = createContext(null);
 
@@ -20,39 +20,41 @@ const DEFAULT_SETTINGS = {
 };
 
 function ensureDeviceId() {
-  let id = localStorage.getItem("rosario:device_id");
+  if (typeof window === "undefined") return "ssr";
+  let id = window.localStorage.getItem("rosario:device_id");
   if (!id) {
     id =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
         : `dev-${Math.random().toString(36).slice(2)}-${Date.now()}`;
-    localStorage.setItem("rosario:device_id", id);
+    window.localStorage.setItem("rosario:device_id", id);
   }
   return id;
 }
 
-export function SettingsProvider({ children }) {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [deviceId] = useState(() => ensureDeviceId());
-
-  // load
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
-      } else {
-        // detect system preference once
-        const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-        setSettings((s) => ({ ...s, theme: prefersDark ? "dark" : "light" }));
-      }
-    } catch {
-      /* ignore */
+// Lazy initializer — reads localStorage SYNCHRONOUSLY on first render.
+// Avoids race with persist effect under React.StrictMode (mount→unmount→remount).
+function loadInitialSettings() {
+  if (typeof window === "undefined") return DEFAULT_SETTINGS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...DEFAULT_SETTINGS, ...parsed };
     }
-  }, []);
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    return { ...DEFAULT_SETTINGS, theme: prefersDark ? "dark" : "light" };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
 
-  // apply to DOM
+export function SettingsProvider({ children }) {
+  const [settings, setSettings] = useState(loadInitialSettings);
+  const [deviceId] = useState(() => ensureDeviceId());
+  const hasMounted = useRef(false);
+
+  // Apply theme + font-size to DOM whenever settings change.
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
@@ -66,9 +68,18 @@ export function SettingsProvider({ children }) {
     root.style.setProperty("--base-font-size", `${FONT_SIZES[settings.fontSize] || 16}px`);
   }, [settings]);
 
-  // persist
+  // Persist to localStorage — skip first run (state is already from localStorage).
+  // This avoids overwriting stored values on mount under StrictMode.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+      /* storage full / blocked */
+    }
   }, [settings]);
 
   const update = useCallback((patch) => {

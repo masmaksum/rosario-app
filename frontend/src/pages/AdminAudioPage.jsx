@@ -15,6 +15,7 @@ const PRAYER_TARGETS = [
   { id: "salam-mempelai", label: "Salam, Mempelai Allah Roh Kudus" },
   { id: "salam-maria", label: "Salam Maria" },
   { id: "terpujilah", label: "Terpujilah" },
+  { id: "doa-fatima", label: "Doa Fatima" },
   { id: "salam-ya-ratu", label: "Salam, Ya Ratu" },
   { id: "doa-penutup", label: "Doa Penutup" },
 ];

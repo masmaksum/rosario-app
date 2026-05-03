@@ -53,6 +53,14 @@ export const PRAYERS = {
     text:
       "Terpujilah nama Yesus, Maria, dan Santo Yosef. Sekarang dan selama-lamanya. Amin.",
   },
+  "doa-fatima": {
+    id: "doa-fatima",
+    title: "Doa Fatima",
+    text:
+      "Ya Yesus yang baik, ampunilah dosa-dosa kami. Selamatkanlah kami dari api neraka " +
+      "dan hantarkanlah jiwa-jiwa ke dalam Surga, terutama mereka yang sangat " +
+      "membutuhkan kerahiman-Mu. Amin.",
+  },
   // Tiga Salam Maria pembukaan — disertai intro yang berbeda.
   "salam-putri": {
     id: "salam-putri",

@@ -18,12 +18,14 @@
 //     12. 10× Salam Maria
 //     13. Kemuliaan
 //     14. Terpujilah
+//     15. Doa Fatima
 //
 //   Penutup:
-//     15. Doa Penutup
-//     16. Tanda Salib
+//     16. Salam, Ya Ratu
+//     17. Doa Penutup (Doakanlah + Marilah Berdoa)
+//     18. Tanda Salib
 //
-//   + 1 halaman Selesai.
+//   + 1 halaman Selesai.  Total: 88 langkah.
 
 import { PRAYERS } from "../data/prayers";
 
@@ -82,7 +84,7 @@ export function buildRosarySteps(mystery) {
       decadeIndex: idx,
       hailMaryIndex: null,
     });
-    // Terpujilah (penanda akhir dekade)
+    // Terpujilah
     steps.push({
       type: "prayer",
       prayerId: "terpujilah",
@@ -90,9 +92,18 @@ export function buildRosarySteps(mystery) {
       decadeIndex: idx,
       hailMaryIndex: null,
     });
+    // Doa Fatima (penanda akhir dekade)
+    steps.push({
+      type: "prayer",
+      prayerId: "doa-fatima",
+      label: `Peristiwa ${event.order} — Doa Fatima`,
+      decadeIndex: idx,
+      hailMaryIndex: null,
+    });
   });
 
   // ====== Penutup ======
+  steps.push({ type: "prayer", prayerId: "salam-ya-ratu", label: "Penutup", ...none });
   steps.push({ type: "prayer", prayerId: "doa-penutup", label: "Penutup", ...none });
   steps.push({ type: "prayer", prayerId: "tanda-salib", label: "Penutup", ...none });
 
@@ -108,5 +119,5 @@ export function getPrayerForStep(step) {
 }
 
 // Penanda langkah terakhir suatu dekade (untuk perhitungan completedDecades):
-// dekade dianggap selesai ketika "terpujilah" pada dekade tersebut telah dilewati.
-export const DECADE_END_PRAYER_ID = "terpujilah";
+// dekade dianggap selesai ketika "doa-fatima" pada dekade tersebut telah dilewati.
+export const DECADE_END_PRAYER_ID = "doa-fatima";

@@ -13,11 +13,12 @@ Dibangun sebagai **PWA** (Progressive Web App) dengan React + FastAPI + MongoDB.
 
 - 🏠 **Halaman Home** dengan rekomendasi peristiwa berdasarkan hari otomatis.
 - 🌿 **Empat Peristiwa Rosario** lengkap: Gembira, Sedih, Mulia, Terang.
-- 📿 **Doa Step-by-Step** (82 langkah) — pembukaan lengkap (Tanda Salib → Aku
+- 📿 **Doa Step-by-Step** (88 langkah) — pembukaan lengkap (Tanda Salib → Aku
   Percaya → Kemuliaan → Bapa Kami → 3 Salam Pembukaan *Putri Allah Bapa /
   Bunda Allah Putra / Mempelai Allah Roh Kudus* → Kemuliaan → Terpujilah),
   5 peristiwa (P + P&U → Bapa Kami → 10× Salam Maria → Kemuliaan →
-  Terpujilah), dan penutup (Doa Penutup → Tanda Salib).
+  Terpujilah → Doa Fatima), dan penutup (Salam Ya Ratu → Doa Penutup →
+  Tanda Salib).
 - 🕊️ **Teks Peristiwa** dengan referensi Kitab Suci dan doa tanggapan
   **P** (Pemimpin) + **P + U** (Pemimpin + Umat) sesuai pakem Indonesia.
 - 🟡 **Visualisasi Manik Rosario** — manik aktif berkilau emas, dekade selesai
