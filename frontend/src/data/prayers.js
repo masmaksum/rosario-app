@@ -104,9 +104,15 @@ export const PRAYERS = {
     id: "doa-penutup",
     title: "Doa Penutup Rosario",
     text:
-      "Ya Allah, Putera-Mu yang tunggal telah memperoleh bagi kami ganjaran kehidupan kekal " +
-      "melalui hidup, wafat, dan kebangkitan-Nya. Kami mohon, bantulah kami yang merenungkan " +
-      "misteri-misteri Rosario Suci Santa Perawan Maria, agar kami dapat meneladani apa yang " +
-      "terkandung di dalamnya, dan memperoleh apa yang dijanjikan, demi Kristus Tuhan kami. Amin.",
+      "Salam, Ya Ratu, Bunda yang berbelas kasih, hidup, hiburan dan harapan kami. " +
+      "Kami semua memanjatkan permohonan, kami amat susah, mengeluh, mengesah dalam lembah duka ini. " +
+      "Ya Ibunda, ya pelindung kami, limpahkanlah kasih sayangMu yang besar kepada kami. " +
+      "Dan Yesus, Putera-Mu yang terpuji itu, semoga Kau tunjukkan kepada kami. " +
+      "O Ratu, O ibu, O Maria, Bunda Kristus.\n\n" +
+      "Doakanlah kami, ya Santa Bunda Allah. Supaya kami dapat menikmati Janji Kristus.\n\n" +
+      "Marilah Berdoa: “Ya Allah, Putera-Mu telah memperoleh bagi kami ganjaran kehidupan kekal " +
+      "melalui hidup, wafat dan kebangkitan-Nya. Kami mohon, agar dengan merenungkan misteri Rosario Suci " +
+      "Santa Perawan Maria, kami dapat menghayati maknanya dan memperoleh apa yang dijanjikan. " +
+      "Demi Kristus, Tuhan kami. Amin.”",
   },
 };
