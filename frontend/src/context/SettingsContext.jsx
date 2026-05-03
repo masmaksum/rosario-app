@@ -15,6 +15,8 @@ const DEFAULT_SETTINGS = {
   theme: "light", // "light" | "dark"
   fontSize: "medium", // "small" | "medium" | "large" | "extraLarge"
   hapticEnabled: true,
+  reminderEnabled: false,
+  reminderTime: "19:00", // HH:MM, 24h
 };
 
 function ensureDeviceId() {

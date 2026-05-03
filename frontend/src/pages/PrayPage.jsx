@@ -7,7 +7,9 @@ import { useProgress } from "../context/ProgressContext";
 import { useSettings } from "../context/SettingsContext";
 import RosaryVisualizer from "../components/RosaryVisualizer";
 import ProgressBar from "../components/ProgressBar";
-import { startSession, completeSession } from "../lib/api";
+import AudioPlayer from "../components/AudioPlayer";
+import { startSession, completeSession, listAudio, audioStreamUrl } from "../lib/api";
+import { markPrayedToday } from "../utils/reminder";
 
 export default function PrayPage() {
   const { mysteryId } = useParams();
@@ -18,8 +20,28 @@ export default function PrayPage() {
   const { progress, start, setStep, clear } = useProgress();
   const { haptic, deviceId } = useSettings();
   const [sessionId, setSessionId] = useState(null);
+  // Audio cache map:  "<kind>:<ref_id>"  ->  { id, ... } | null
+  const [audioMap, setAudioMap] = useState({});
 
   const steps = useMemo(() => (mystery ? buildRosarySteps(mystery) : []), [mystery]);
+
+  // Preload audio metadata for this mystery's prayers + events
+  useEffect(() => {
+    let cancelled = false;
+    listAudio()
+      .then((all) => {
+        if (cancelled) return;
+        const map = {};
+        for (const a of all) map[`${a.kind}:${a.ref_id}`] = a;
+        setAudioMap(map);
+      })
+      .catch(() => {
+        /* offline ok */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mysteryId]);
 
   // Initialize / resume progress
   useEffect(() => {
@@ -70,8 +92,9 @@ export default function PrayPage() {
     haptic(10);
     const next = idx + 1;
     setStep(next);
-    if (steps[next].type === "complete" && sessionId) {
-      completeSession(sessionId).catch(() => {});
+    if (steps[next].type === "complete") {
+      markPrayedToday();
+      if (sessionId) completeSession(sessionId).catch(() => {});
     }
   };
 
@@ -86,6 +109,21 @@ export default function PrayPage() {
   };
 
   const prayer = getPrayerForStep(step);
+
+  // Compute audio URL for current step (if any uploaded)
+  const currentAudio = (() => {
+    if (!step) return null;
+    if (step.type === "prayer") {
+      const hit = audioMap[`prayer:${step.prayerId}`];
+      return hit ? audioStreamUrl(hit.id) : null;
+    }
+    if (step.type === "reflection") {
+      const key = `event:${mystery.id}:${step.mysteryEventOrder}`;
+      const hit = audioMap[key];
+      return hit ? audioStreamUrl(hit.id) : null;
+    }
+    return null;
+  })();
 
   return (
     <div className="fade-in min-h-screen flex flex-col">
@@ -144,6 +182,7 @@ export default function PrayPage() {
                 Salam Maria {step.hailMaryIndex} / 10
               </p>
             )}
+            <AudioPlayer src={currentAudio} />
           </article>
         )}
 
@@ -179,6 +218,8 @@ export default function PrayPage() {
               </p>
               <p className="leading-relaxed">{step.responseText}</p>
             </div>
+
+            <AudioPlayer src={currentAudio} />
           </article>
         )}
 

@@ -1,17 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Moon, Sun, Type, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Moon,
+  Sun,
+  Type,
+  Trash2,
+  Bell,
+  BellOff,
+  Clock,
+  Mic,
+  ChevronRight,
+} from "lucide-react";
 import { useSettings, FONT_SIZE_OPTIONS } from "../context/SettingsContext";
 import { useProgress } from "../context/ProgressContext";
+import { requestNotificationPermission } from "../utils/reminder";
 
 export default function SettingsPage() {
   const { settings, update, toggleTheme } = useSettings();
   const { clear } = useProgress();
+  const [notifStatus, setNotifStatus] = useState(
+    typeof Notification !== "undefined" ? Notification.permission : "unsupported"
+  );
 
   const resetProgress = () => {
     if (window.confirm("Hapus progress doa terakhir?")) {
       clear();
     }
+  };
+
+  const toggleReminder = async () => {
+    const next = !settings.reminderEnabled;
+    if (next) {
+      const perm = await requestNotificationPermission();
+      setNotifStatus(perm);
+    }
+    update({ reminderEnabled: next });
   };
 
   return (
@@ -64,9 +88,7 @@ export default function SettingsPage() {
             <Type className="h-5 w-5 text-primary" />
             <div>
               <p className="font-medium">Ukuran Teks</p>
-              <p className="text-sm text-muted-foreground">
-                Pilih kenyamanan membaca
-              </p>
+              <p className="text-sm text-muted-foreground">Pilih kenyamanan membaca</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -87,13 +109,79 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Reminder */}
+        <div className="rounded-2xl border border-border p-5 bg-card space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {settings.reminderEnabled ? (
+                <Bell className="h-5 w-5 text-primary" />
+              ) : (
+                <BellOff className="h-5 w-5 text-muted-foreground" />
+              )}
+              <div>
+                <p className="font-medium">Pengingat Doa Harian</p>
+                <p className="text-sm text-muted-foreground">
+                  Pesan lembut sekali sehari
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={toggleReminder}
+              data-testid="toggle-reminder-btn"
+              className={`relative w-14 h-8 rounded-full transition-colors ${
+                settings.reminderEnabled ? "bg-primary" : "bg-border"
+              }`}
+              aria-pressed={settings.reminderEnabled}
+            >
+              <span
+                className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                  settings.reminderEnabled ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+
+          {settings.reminderEnabled && (
+            <>
+              <div className="flex items-center gap-3 pt-2 border-t border-border">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <label htmlFor="reminder-time" className="text-sm flex-1">
+                  Waktu pengingat
+                </label>
+                <input
+                  id="reminder-time"
+                  data-testid="reminder-time-input"
+                  type="time"
+                  value={settings.reminderTime}
+                  onChange={(e) => update({ reminderTime: e.target.value })}
+                  className="h-10 px-3 rounded-lg border border-border bg-background text-base"
+                />
+              </div>
+              {notifStatus === "denied" && (
+                <p className="text-xs text-destructive">
+                  Notifikasi browser tidak diizinkan. Pengingat hanya akan tampil
+                  sebagai banner di halaman utama.
+                </p>
+              )}
+              {notifStatus === "granted" && (
+                <p className="text-xs text-muted-foreground">
+                  Notifikasi browser aktif. Pengingat akan tampil saat aplikasi dibuka.
+                </p>
+              )}
+              {notifStatus === "default" && (
+                <p className="text-xs text-muted-foreground">
+                  Aktifkan sekali lagi untuk meminta izin notifikasi browser.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+
         {/* Haptic */}
         <div className="rounded-2xl border border-border p-5 flex items-center justify-between bg-card">
           <div>
             <p className="font-medium">Getaran Halus</p>
-            <p className="text-sm text-muted-foreground">
-              Saat berpindah manik
-            </p>
+            <p className="text-sm text-muted-foreground">Saat berpindah manik</p>
           </div>
           <button
             onClick={() => update({ hapticEnabled: !settings.hapticEnabled })}
@@ -110,6 +198,24 @@ export default function SettingsPage() {
             />
           </button>
         </div>
+
+        {/* Admin: audio */}
+        <Link
+          to="/admin/audio"
+          data-testid="admin-audio-link"
+          className="rounded-2xl border border-border p-5 flex items-center justify-between bg-card hover:bg-secondary/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Mic className="h-5 w-5 text-primary" />
+            <div>
+              <p className="font-medium">Kelola Audio Narator</p>
+              <p className="text-sm text-muted-foreground">
+                Unggah rekaman doa & peristiwa
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </Link>
 
         {/* Reset progress */}
         <button

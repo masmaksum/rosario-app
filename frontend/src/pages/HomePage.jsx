@@ -1,10 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sparkles, Settings as SettingsIcon, Heart, BookOpen, Play } from "lucide-react";
+import {
+  Sparkles,
+  Settings as SettingsIcon,
+  Heart,
+  BookOpen,
+  Play,
+  History,
+  X,
+  Bell,
+} from "lucide-react";
 import { DAY_NAMES_ID, getMysteryById, getRecommendedMysteryId } from "../data/mysteries";
 import { useSettings } from "../context/SettingsContext";
 import { useProgress } from "../context/ProgressContext";
 import { getStats } from "../lib/api";
+import {
+  shouldShowReminderNow,
+  tryShowBrowserNotification,
+  markNotifShownToday,
+} from "../utils/reminder";
 
 function getGreeting(date = new Date()) {
   const h = date.getHours();
@@ -16,9 +30,10 @@ function getGreeting(date = new Date()) {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { deviceId } = useSettings();
+  const { deviceId, settings } = useSettings();
   const { progress } = useProgress();
   const [stats, setStats] = useState(null);
+  const [showReminder, setShowReminder] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const recommendedId = useMemo(() => getRecommendedMysteryId(today), [today]);
@@ -42,6 +57,18 @@ export default function HomePage() {
     };
   }, [deviceId]);
 
+  // Reminder check on mount
+  useEffect(() => {
+    if (shouldShowReminderNow(settings)) {
+      setShowReminder(true);
+      if (tryShowBrowserNotification()) {
+        markNotifShownToday();
+      } else {
+        markNotifShownToday();
+      }
+    }
+  }, [settings]);
+
   const startToday = () => {
     navigate(`/doa/${recommended.id}?from=home`);
   };
@@ -53,15 +80,50 @@ export default function HomePage() {
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Rosario</p>
           <h1 className="font-serif-display text-3xl mt-1">{getGreeting()}</h1>
         </div>
-        <Link
-          to="/pengaturan"
-          className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-          aria-label="Pengaturan"
-          data-testid="home-settings-btn"
-        >
-          <SettingsIcon className="h-5 w-5" />
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to="/riwayat"
+            className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+            aria-label="Riwayat"
+            data-testid="home-riwayat-btn"
+          >
+            <History className="h-5 w-5" />
+          </Link>
+          <Link
+            to="/pengaturan"
+            className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+            aria-label="Pengaturan"
+            data-testid="home-settings-btn"
+          >
+            <SettingsIcon className="h-5 w-5" />
+          </Link>
+        </div>
       </header>
+
+      {showReminder && (
+        <div
+          data-testid="reminder-banner"
+          className="mb-6 rounded-2xl border border-accent/40 bg-accent/10 p-4 flex items-start gap-3 fade-in"
+        >
+          <Bell className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-medium text-foreground">
+              Waktunya berdoa Rosario
+            </p>
+            <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">
+              Mari menyediakan waktu sejenak bersama Bunda Maria.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowReminder(false)}
+            aria-label="Tutup pengingat"
+            data-testid="reminder-dismiss-btn"
+            className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:bg-background"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       <section className="mb-8" data-testid="home-today-card">
         <p className="text-sm text-muted-foreground">

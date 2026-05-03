@@ -7,6 +7,8 @@ import SelectMysteryPage from "./pages/SelectMysteryPage";
 import PrayPage from "./pages/PrayPage";
 import SettingsPage from "./pages/SettingsPage";
 import IntentionsPage from "./pages/IntentionsPage";
+import RiwayatPage from "./pages/RiwayatPage";
+import AdminAudioPage from "./pages/AdminAudioPage";
 
 function App() {
   return (
@@ -20,7 +22,9 @@ function App() {
                 <Route path="/pilih-peristiwa" element={<SelectMysteryPage />} />
                 <Route path="/doa/:mysteryId" element={<PrayPage />} />
                 <Route path="/intensi" element={<IntentionsPage />} />
+                <Route path="/riwayat" element={<RiwayatPage />} />
                 <Route path="/pengaturan" element={<SettingsPage />} />
+                <Route path="/admin/audio" element={<AdminAudioPage />} />
               </Routes>
             </BrowserRouter>
           </div>
