@@ -52,6 +52,23 @@ export async function getStats(deviceId) {
   return data;
 }
 
+// Admin auth
+export function getAdminKey() {
+  return sessionStorage.getItem("rosario:admin_key") || "";
+}
+export function setAdminKey(key) {
+  sessionStorage.setItem("rosario:admin_key", key);
+}
+export function clearAdminKey() {
+  sessionStorage.removeItem("rosario:admin_key");
+}
+export async function verifyAdminKey(key) {
+  const { data } = await client.get("/admin/verify", {
+    headers: { "X-Admin-Key": key },
+  });
+  return data;
+}
+
 // Audio
 export async function listAudio(params = {}) {
   const { data } = await client.get(`/audio`, { params });
@@ -64,12 +81,14 @@ export async function uploadAudio({ kind, ref_id, title, file }) {
   if (title) fd.append("title", title);
   fd.append("file", file);
   const { data } = await client.post(`/audio/upload`, fd, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { "Content-Type": "multipart/form-data", "X-Admin-Key": getAdminKey() },
   });
   return data;
 }
 export async function deleteAudio(id) {
-  const { data } = await client.delete(`/audio/${id}`);
+  const { data } = await client.delete(`/audio/${id}`, {
+    headers: { "X-Admin-Key": getAdminKey() },
+  });
   return data;
 }
 export function audioStreamUrl(id) {

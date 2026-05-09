@@ -199,23 +199,7 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {/* Admin: audio */}
-        <Link
-          to="/admin/audio"
-          data-testid="admin-audio-link"
-          className="rounded-2xl border border-border p-5 flex items-center justify-between bg-card hover:bg-secondary/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <Mic className="h-5 w-5 text-primary" />
-            <div>
-              <p className="font-medium">Kelola Audio Narator</p>
-              <p className="text-sm text-muted-foreground">
-                Unggah rekaman doa & peristiwa
-              </p>
-            </div>
-          </div>
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-        </Link>
+
 
         {/* Reset progress */}
         <button

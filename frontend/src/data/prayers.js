@@ -25,6 +25,16 @@ export const PRAYERS = {
   "bapa-kami": {
     id: "bapa-kami",
     title: "Bapa Kami",
+    // P: kalimat pembuka oleh pemimpin
+    leaderText: "Bapa kami yang ada di surga,",
+    // P+U: sambungan bersama sampai Amin
+    responseText:
+      "dimuliakanlah nama-Mu, datanglah kerajaan-Mu, " +
+      "jadilah kehendak-Mu di atas bumi seperti di dalam surga. " +
+      "Berilah kami rezeki pada hari ini, dan ampunilah kesalahan kami, " +
+      "seperti kami pun mengampuni yang bersalah kepada kami. " +
+      "Dan janganlah masukkan kami ke dalam pencobaan, " +
+      "tetapi bebaskanlah kami dari yang jahat. Amin.",
     text:
       "Bapa kami yang ada di surga, dimuliakanlah nama-Mu, datanglah kerajaan-Mu, " +
       "jadilah kehendak-Mu di atas bumi seperti di dalam surga. " +
@@ -35,6 +45,15 @@ export const PRAYERS = {
   "salam-maria": {
     id: "salam-maria",
     title: "Salam Maria",
+    // P: bagian pemimpin
+    leaderText:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; " +
+      "terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus.",
+    // P+U: sambungan umat
+    responseText:
+      "Santa Maria, Bunda Allah, doakanlah kami yang berdosa ini, " +
+      "sekarang dan waktu kami mati. Amin.",
     text:
       "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
       "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
@@ -50,8 +69,7 @@ export const PRAYERS = {
   "terpujilah": {
     id: "terpujilah",
     title: "Terpujilah",
-    text:
-      "Terpujilah nama Yesus, Maria, dan Santo Yosef. Sekarang dan selama-lamanya. Amin.",
+    text: "Terpujilah nama Yesus, Maria, dan Santo Yosef. Sekarang dan selama-lamanya. Amin.",
   },
   "doa-fatima": {
     id: "doa-fatima",
@@ -66,6 +84,13 @@ export const PRAYERS = {
     id: "salam-putri",
     title: "Salam, Putri Allah Bapa",
     intro: "Salam, Putri Allah Bapa.",
+    leaderText:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; " +
+      "terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus.",
+    responseText:
+      "Santa Maria, Bunda Allah, doakanlah kami yang berdosa ini, " +
+      "sekarang dan waktu kami mati. Amin.",
     text:
       "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
       "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
@@ -75,6 +100,13 @@ export const PRAYERS = {
     id: "salam-bunda",
     title: "Salam, Bunda Allah Putra",
     intro: "Salam, Bunda Allah Putra.",
+    leaderText:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; " +
+      "terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus.",
+    responseText:
+      "Santa Maria, Bunda Allah, doakanlah kami yang berdosa ini, " +
+      "sekarang dan waktu kami mati. Amin.",
     text:
       "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
       "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
@@ -84,6 +116,13 @@ export const PRAYERS = {
     id: "salam-mempelai",
     title: "Salam, Mempelai Allah Roh Kudus",
     intro: "Salam, Mempelai Allah Roh Kudus.",
+    leaderText:
+      "Salam Maria, penuh rahmat, Tuhan sertamu; " +
+      "terpujilah engkau di antara wanita, " +
+      "dan terpujilah buah tubuhmu, Yesus.",
+    responseText:
+      "Santa Maria, Bunda Allah, doakanlah kami yang berdosa ini, " +
+      "sekarang dan waktu kami mati. Amin.",
     text:
       "Salam Maria, penuh rahmat, Tuhan sertamu; terpujilah engkau di antara wanita, " +
       "dan terpujilah buah tubuhmu, Yesus. Santa Maria, Bunda Allah, " +
@@ -92,13 +131,37 @@ export const PRAYERS = {
   "salam-ya-ratu": {
     id: "salam-ya-ratu",
     title: "Salam, Ya Ratu",
+    leaderText:
+      "Salam, Ya Ratu, Bunda yang berbelas kasih, hidup, hiburan dan harapan kami. " +
+      "Kami semua memanjatkan permohonan, kami amat susah, mengeluh, mengesah dalam lembah duka ini. " +
+      "Ya Ibunda, ya pelindung kami, limpahkanlah kasih sayangMu yang besar kepada kami. " +
+      "Dan Yesus, Putera-Mu yang terpuji itu, semoga Kau tunjukkan kepada kami. " +
+      "O Ratu, O ibu, O Maria, Bunda Kristus.",
+    responseText:
+      "Doakanlah kami, ya Santa Bunda Allah. " +
+      "Supaya kami dapat menikmati Janji Kristus.",
     text:
-      "Salam, ya Ratu, Bunda yang berbelas kasih, hidup, hiburan, dan harapan kami. " +
-      "Kami semua memanjatkan permohonan kepadamu, kami, anak-anak Hawa yang berkeluh kesah, " +
-      "mengaduh dan menangis dalam lembah duka ini. Ya Pelindung kami, limpahkanlah kasih sayangmu " +
-      "kepada kami. Dan setelah masa pembuangan ini, perlihatkanlah kepada kami Yesus, " +
-      "buah tubuhmu yang terpuji. O Ratu, o Ibu, o Maria, Bunda Kristus yang manis. " +
-      "Doakanlah kami, ya Santa Bunda Allah, supaya kami dapat menikmati janji Kristus. Amin.",
+      "Salam, Ya Ratu, Bunda yang berbelas kasih, hidup, hiburan dan harapan kami. " +
+      "Kami semua memanjatkan permohonan, kami amat susah, mengeluh, mengesah dalam lembah duka ini. " +
+      "Ya Ibunda, ya pelindung kami, limpahkanlah kasih sayangMu yang besar kepada kami. " +
+      "Dan Yesus, Putera-Mu yang terpuji itu, semoga Kau tunjukkan kepada kami. " +
+      "O Ratu, O ibu, O Maria, Bunda Kristus. " +
+      "Doakanlah kami, ya Santa Bunda Allah. Supaya kami dapat menikmati Janji Kristus.",
+  },
+  "marilah-berdoa": {
+    id: "marilah-berdoa",
+    title: "Doa Penutup",
+    leaderText: "Marilah Berdoa:",
+    responseText:
+      "\u201cYa Allah, Putera-Mu telah memperoleh bagi kami ganjaran kehidupan kekal " +
+      "melalui hidup, wafat dan kebangkitan-Nya. Kami mohon, agar dengan merenungkan " +
+      "misteri Rosario Suci Santa Perawan Maria, kami dapat menghayati maknanya dan " +
+      "memperoleh apa yang dijanjikan. Demi Kristus, Tuhan kami. Amin.\u201d",
+    text:
+      "Marilah Berdoa: Ya Allah, Putera-Mu telah memperoleh bagi kami ganjaran kehidupan kekal " +
+      "melalui hidup, wafat dan kebangkitan-Nya. Kami mohon, agar dengan merenungkan " +
+      "misteri Rosario Suci Santa Perawan Maria, kami dapat menghayati maknanya dan " +
+      "memperoleh apa yang dijanjikan. Demi Kristus, Tuhan kami. Amin.",
   },
   "doa-penutup": {
     id: "doa-penutup",

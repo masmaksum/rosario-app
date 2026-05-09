@@ -9,6 +9,8 @@ import {
   History,
   X,
   Bell,
+  ScrollText,
+  Clock,
 } from "lucide-react";
 import { DAY_NAMES_ID, getMysteryById, getRecommendedMysteryId } from "../data/mysteries";
 import { useSettings } from "../context/SettingsContext";
@@ -162,6 +164,25 @@ export default function HomePage() {
         >
           <Heart className="h-4 w-4" /> Intensi Doa
         </Link>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        <Link
+          to="/litani"
+          data-testid="litani-btn"
+          className="h-14 rounded-2xl border border-border flex items-center justify-center gap-2 text-primary hover:bg-secondary transition-colors"
+        >
+          <ScrollText className="h-4 w-4" /> Litani
+        </Link>
+        <button
+          disabled
+          data-testid="novena-btn"
+          className="h-14 rounded-2xl border border-border flex items-center justify-center gap-2 text-muted-foreground opacity-50 cursor-not-allowed"
+        >
+          <Clock className="h-4 w-4" />
+          <span>Novena</span>
+          <span className="text-xs ml-0.5 bg-muted px-1.5 py-0.5 rounded-full">Segera</span>
+        </button>
       </div>
 
       {progress && progress.stepIndex > 0 && progress.stepIndex < progress.totalSteps && (
