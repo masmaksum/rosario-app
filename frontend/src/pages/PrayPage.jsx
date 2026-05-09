@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ChevronLeft, ChevronRight, Pause } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Pause, Heart } from "lucide-react";
 import { getMysteryById } from "../data/mysteries";
 import { buildRosarySteps, getPrayerForStep, DECADE_END_PRAYER_ID } from "../utils/rosaryFlow";
+import { getLitaniById } from "../data/litani";
 import { useProgress } from "../context/ProgressContext";
 import { useSettings } from "../context/SettingsContext";
 import RosaryVisualizer from "../components/RosaryVisualizer";
 import ProgressBar from "../components/ProgressBar";
 import AudioPlayer from "../components/AudioPlayer";
-import { startSession, completeSession, listAudio, audioStreamUrl } from "../lib/api";
+import { startSession, completeSession, listAudio, audioStreamUrl, listIntentions } from "../lib/api";
 import { markPrayedToday } from "../utils/reminder";
 
 export default function PrayPage() {
@@ -20,12 +21,19 @@ export default function PrayPage() {
   const { progress, start, setStep, clear } = useProgress();
   const { haptic, deviceId } = useSettings();
   const [sessionId, setSessionId] = useState(null);
-  // Audio cache map:  "<kind>:<ref_id>"  ->  { id, ... } | null
   const [audioMap, setAudioMap] = useState({});
+  const [intentions, setIntentions] = useState([]);
+  const [intentionsLoaded, setIntentionsLoaded] = useState(false);
 
-  const steps = useMemo(() => (mystery ? buildRosarySteps(mystery) : []), [mystery]);
+  const starredLitani = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem("rosario:starred_litani") || "[]"); }
+    catch { return []; }
+  }, []);
+  const steps = useMemo(
+    () => (mystery ? buildRosarySteps(mystery, starredLitani) : []),
+    [mystery, starredLitani]
+  );
 
-  // Preload audio metadata for this mystery's prayers + events
   useEffect(() => {
     let cancelled = false;
     listAudio()
@@ -35,15 +43,17 @@ export default function PrayPage() {
         for (const a of all) map[`${a.kind}:${a.ref_id}`] = a;
         setAudioMap(map);
       })
-      .catch(() => {
-        /* offline ok */
-      });
-    return () => {
-      cancelled = true;
-    };
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, [mysteryId]);
 
-  // Initialize / resume progress
+  useEffect(() => {
+    if (!deviceId) return;
+    listIntentions(deviceId)
+      .then((data) => { setIntentions(data); setIntentionsLoaded(true); })
+      .catch(() => { setIntentions([]); setIntentionsLoaded(true); });
+  }, [deviceId]);
+
   useEffect(() => {
     if (!mystery) return;
     if (
@@ -54,14 +64,24 @@ export default function PrayPage() {
     ) {
       start(mystery.id, steps.length);
     }
-    // create remote session (best-effort)
     startSession(deviceId, mystery.id)
       .then((s) => setSessionId(s.id))
-      .catch(() => {
-        /* offline ok */
-      });
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mystery?.id]);
+
+  // Semua kalkulasi dan hooks sebelum early return
+  const idx = progress && progress.mysteryId === mystery?.id ? progress.stepIndex : 0;
+  const step = steps[idx];
+  const isIntentionsStep = step?.type === "intentions";
+  const shouldSkipIntentions = intentionsLoaded && intentions.length === 0;
+
+  useEffect(() => {
+    if (isIntentionsStep && shouldSkipIntentions && idx + 1 < steps.length) {
+      setStep(idx + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isIntentionsStep, shouldSkipIntentions]);
 
   if (!mystery) {
     return (
@@ -73,10 +93,6 @@ export default function PrayPage() {
       </div>
     );
   }
-
-  const idx =
-    progress && progress.mysteryId === mystery.id ? progress.stepIndex : 0;
-  const step = steps[idx];
 
   let lastFinished = -1;
   for (let i = 0; i < idx; i++) {
@@ -90,7 +106,9 @@ export default function PrayPage() {
   const goNext = () => {
     if (idx >= steps.length - 1) return;
     haptic(10);
-    const next = idx + 1;
+    let next = idx + 1;
+    if (steps[next]?.type === "intentions" && shouldSkipIntentions) next = idx + 2;
+    if (next >= steps.length) return;
     setStep(next);
     if (steps[next].type === "complete") {
       markPrayedToday();
@@ -101,16 +119,17 @@ export default function PrayPage() {
   const goBack = () => {
     if (idx === 0) return;
     haptic(8);
-    setStep(idx - 1);
+    let prev = idx - 1;
+    if (steps[prev]?.type === "intentions" && shouldSkipIntentions) prev = idx - 2;
+    if (prev < 0) return;
+    setStep(prev);
   };
 
-  const exitWithSave = () => {
-    navigate("/");
-  };
+  const exitWithSave = () => { navigate("/"); };
 
   const prayer = getPrayerForStep(step);
+  const litaniData = step?.type === "litani" ? getLitaniById(step.litaniId) : null;
 
-  // Compute audio URL for current step (if any uploaded)
   const currentAudio = (() => {
     if (!step) return null;
     if (step.type === "prayer") {
@@ -118,16 +137,19 @@ export default function PrayPage() {
       return hit ? audioStreamUrl(hit.id) : null;
     }
     if (step.type === "reflection") {
-      const key = `event:${mystery.id}:${step.mysteryEventOrder}`;
-      const hit = audioMap[key];
+      const hit = audioMap[`event:${mystery.id}:${step.mysteryEventOrder}`];
       return hit ? audioStreamUrl(hit.id) : null;
     }
     return null;
   })();
 
+  const showBeads = step?.type !== "complete";
+
   return (
-    <div className="fade-in min-h-screen flex flex-col">
-      <header className="flex items-center justify-between px-6 pt-6 pb-2">
+    <div className="fade-in h-screen flex flex-col overflow-hidden">
+
+      {/* ── Header ── */}
+      <header className="shrink-0 flex items-center justify-between px-6 pt-6 pb-2">
         <button
           onClick={() => navigate(-1)}
           className="h-10 w-10 rounded-full border border-border flex items-center justify-center"
@@ -152,14 +174,13 @@ export default function PrayPage() {
         </button>
       </header>
 
-      <div className="px-6 mt-4">
-        <ProgressBar value={idx + 1} total={steps.length} />
-      </div>
 
+      {/* ── Konten doa + tombol navigasi (scrollable) ── */}
       <main
-        className="flex-1 px-6 py-8 flex flex-col items-center justify-start"
+        className="flex-1 overflow-y-auto px-6 py-6 flex flex-col items-center"
         data-testid="pray-step-content"
       >
+        {/* Doa biasa */}
         {step?.type === "prayer" && prayer && (
           <article className="max-w-md w-full text-center fade-in">
             <h2 className="font-serif-display text-3xl text-primary">
@@ -170,13 +191,33 @@ export default function PrayPage() {
                 {prayer.intro}
               </p>
             )}
-            <p
-              className="mt-6 leading-relaxed text-foreground/90 whitespace-pre-line"
-              style={{ fontSize: "1.125rem" }}
-              data-testid="prayer-text"
-            >
-              {prayer.text}
-            </p>
+            {prayer.leaderText && prayer.responseText ? (
+              <div className="mt-6 space-y-4">
+                <p
+                  className="leading-relaxed text-foreground/90"
+                  style={{ fontSize: "1.125rem" }}
+                  data-testid="prayer-leader"
+                >
+                  {prayer.leaderText}
+                </p>
+                <div
+                  className="rounded-2xl border border-accent/40 bg-accent/10 p-4"
+                  data-testid="prayer-response"
+                >
+                  <p className="leading-relaxed" style={{ fontSize: "1.125rem" }}>
+                    {prayer.responseText}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p
+                className="mt-6 leading-relaxed text-foreground/90 whitespace-pre-line"
+                style={{ fontSize: "1.125rem" }}
+                data-testid="prayer-text"
+              >
+                {prayer.text}
+              </p>
+            )}
             {step.hailMaryIndex && (
               <p className="mt-6 text-sm uppercase tracking-[0.2em] text-accent">
                 Salam Maria {step.hailMaryIndex} / 10
@@ -186,6 +227,7 @@ export default function PrayPage() {
           </article>
         )}
 
+        {/* Peristiwa (refleksi) */}
         {step?.type === "reflection" && (
           <article className="max-w-md w-full fade-in" data-testid="reflection-block">
             <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground text-center">
@@ -197,18 +239,10 @@ export default function PrayPage() {
             <p className="text-center text-sm text-muted-foreground mt-2">
               {step.scripture}
             </p>
-
-            {/* P (Pemimpin) */}
             <div className="mt-6" data-testid="reflection-leader">
-              <p className="text-xs font-semibold tracking-wider text-primary/80 mb-1">
-                P
-              </p>
-              <p className="leading-relaxed text-foreground/90">
-                {step.leaderText}
-              </p>
+              <p className="text-xs font-semibold tracking-wider text-primary/80 mb-1">P</p>
+              <p className="leading-relaxed text-foreground/90">{step.leaderText}</p>
             </div>
-
-            {/* P + U (Pemimpin + Umat) */}
             <div
               className="mt-6 rounded-2xl border border-accent/40 bg-accent/10 p-4"
               data-testid="reflection-response"
@@ -218,11 +252,100 @@ export default function PrayPage() {
               </p>
               <p className="leading-relaxed">{step.responseText}</p>
             </div>
-
             <AudioPlayer src={currentAudio} />
           </article>
         )}
 
+        {/* Intensi Doa */}
+        {step?.type === "intentions" && intentions.length > 0 && (
+          <article className="max-w-md w-full fade-in" data-testid="intentions-block">
+            <h2 className="font-serif-display text-3xl text-primary text-center mb-6">
+              Intensi Doa
+            </h2>
+            <p className="leading-relaxed text-foreground/90" style={{ fontSize: "1.0625rem" }}>
+              Bunda Maria, Ratu Rosario, engkau sudi datang ke Fatima, memberitakan kepada
+              tiga anak gembala, harta rahmat yang terkandung dalam doa Rosario.
+              Sudilah membangkitkan dalam hatiku devosi ini, agar dengan merenungkan
+              misteri-misteri penebusan Putera-Mu aku diperkaya dengan hasil buahnya,
+              membawa perdamaian bagi dunia dan pertobatan bagi para pendosa, serta
+              memperoleh anugerah khusus yang kumohon dalam doa Rosario ini…
+            </p>
+            <ul className="mt-5 space-y-3" data-testid="intentions-in-prayer">
+              {intentions.map((it) => (
+                <li
+                  key={it.id}
+                  className="rounded-2xl border border-accent/40 bg-accent/10 p-4 text-center"
+                >
+                  <Heart className="h-4 w-4 mx-auto mb-2 text-accent" />
+                  <p className="leading-relaxed">{it.text}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 leading-relaxed text-foreground/90" style={{ fontSize: "1.0625rem" }}>
+              Aku mohon semuanya itu demi kemuliaan Allah, untuk menghormat Engkau dan
+              untuk mendapatkan keselamatan jiwa bagiku dan bagi sekalian orang. Amin.
+            </p>
+          </article>
+        )}
+
+        {/* Litani berbintang */}
+        {step?.type === "litani" && litaniData && (
+          <article className="max-w-md w-full fade-in" data-testid="litani-block">
+            <h2 className="font-serif-display text-3xl text-primary text-center mb-6">
+              {litaniData.title}
+            </h2>
+            <div className="space-y-2">
+              {litaniData.lines.map((line, i) => {
+                if (line.type === "together" || line.type === "prayer") {
+                  return (
+                    <div key={i} className="rounded-2xl border border-border bg-card p-4 text-sm leading-relaxed whitespace-pre-line">
+                      {line.text}
+                    </div>
+                  );
+                }
+                if (line.type === "leader") {
+                  return (
+                    <div key={i} className="rounded-2xl border border-border bg-card p-4 text-sm leading-relaxed whitespace-pre-line">
+                      <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">Pemimpin</span>
+                      {line.text}
+                    </div>
+                  );
+                }
+                if (line.type === "response") {
+                  return (
+                    <div key={i} className="rounded-2xl border border-accent/50 bg-accent/10 p-4 text-sm leading-relaxed whitespace-pre-line">
+                      <span className="text-xs uppercase tracking-widest text-muted-foreground block mb-1">Umat</span>
+                      {line.text}
+                    </div>
+                  );
+                }
+                if (line.type === "invocations") {
+                  return (
+                    <div key={i} className="space-y-1">
+                      {line.items.map((item, j) => (
+                        <div key={j} className="rounded-2xl border border-border bg-card px-4 py-3">
+                          <p className="text-sm leading-relaxed">{item}</p>
+                          <p className="text-sm text-muted-foreground mt-1 italic">{line.response}</p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                if (line.type === "invocation") {
+                  return (
+                    <div key={i} className="rounded-2xl border border-border bg-card px-4 py-3">
+                      <p className="text-sm leading-relaxed">{line.text}</p>
+                      <p className="text-sm text-muted-foreground mt-1 italic">{line.response}</p>
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </article>
+        )}
+
+        {/* Selesai */}
         {step?.type === "complete" && (
           <article className="max-w-md w-full text-center fade-in" data-testid="complete-block">
             <h2 className="font-serif-display text-4xl text-primary">
@@ -234,20 +357,14 @@ export default function PrayPage() {
             </p>
             <div className="mt-8 grid gap-3">
               <button
-                onClick={() => {
-                  clear();
-                  navigate("/");
-                }}
+                onClick={() => { clear(); navigate("/"); }}
                 className="h-14 rounded-2xl bg-primary text-primary-foreground font-medium"
                 data-testid="complete-home-btn"
               >
                 Kembali ke Beranda
               </button>
               <button
-                onClick={() => {
-                  clear();
-                  navigate("/pilih-peristiwa");
-                }}
+                onClick={() => { clear(); navigate("/pilih-peristiwa"); }}
                 className="h-14 rounded-2xl border-2 border-primary text-primary font-medium"
                 data-testid="complete-pick-btn"
               >
@@ -256,18 +373,10 @@ export default function PrayPage() {
             </div>
           </article>
         )}
-      </main>
 
-      {step?.type !== "complete" && (
-        <>
-          <div className="px-6 pb-3">
-            <RosaryVisualizer
-              decadeIndex={step?.decadeIndex ?? null}
-              hailMaryIndex={step?.hailMaryIndex ?? null}
-              completedDecades={completedDecades}
-            />
-          </div>
-          <nav className="px-6 pb-8 grid grid-cols-2 gap-3">
+        {/* Tombol navigasi — langsung di bawah konten doa */}
+        {step?.type !== "complete" && (
+          <nav className="w-full max-w-md grid grid-cols-2 gap-3 mt-8 mb-2">
             <button
               onClick={goBack}
               disabled={idx === 0}
@@ -284,8 +393,23 @@ export default function PrayPage() {
               Lanjut <ChevronRight className="h-5 w-5" />
             </button>
           </nav>
-        </>
+        )}
+      </main>
+
+      {/* ── Manik-manik — selalu terlihat di bagian bawah ── */}
+      {showBeads && (
+        <div className="shrink-0 px-6 pt-1 pb-4">
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1">
+            Langkah {idx + 1} dari {steps.length}
+          </p>
+          <RosaryVisualizer
+            decadeIndex={step?.decadeIndex ?? null}
+            hailMaryIndex={step?.hailMaryIndex ?? null}
+            completedDecades={completedDecades}
+          />
+        </div>
       )}
+
     </div>
   );
 }

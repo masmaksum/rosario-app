@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, Trash2, Music2, Lock } from "lucide-react";
-import { listAudio, uploadAudio, deleteAudio, audioStreamUrl } from "../lib/api";
+import { listAudio, uploadAudio, deleteAudio, audioStreamUrl, getAdminKey, clearAdminKey } from "../lib/api";
 import { MYSTERIES } from "../data/mysteries";
 
 // Prayers that can have an audio associated with them (keys from /data/prayers.js)
@@ -34,6 +34,7 @@ function buildEventTargets() {
 }
 
 export default function AdminAudioPage() {
+  const navigate = useNavigate();
   const [audios, setAudios] = useState([]);
   const [kind, setKind] = useState("prayer");
   const [refId, setRefId] = useState("bapa-kami");
@@ -57,8 +58,9 @@ export default function AdminAudioPage() {
   };
 
   useEffect(() => {
+    if (!getAdminKey()) { navigate("/admin/login"); return; }
     load();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-adjust refId when kind changes
   useEffect(() => {
@@ -97,6 +99,7 @@ export default function AdminAudioPage() {
       if (inp) inp.value = "";
       await load();
     } catch (e) {
+      if (e?.response?.status === 401) { clearAdminKey(); navigate("/admin/login"); return; }
       setError(e?.response?.data?.detail || "Gagal mengunggah.");
     } finally {
       setLoading(false);
@@ -108,7 +111,8 @@ export default function AdminAudioPage() {
     try {
       await deleteAudio(id);
       await load();
-    } catch {
+    } catch (e) {
+      if (e?.response?.status === 401) { clearAdminKey(); navigate("/admin/login"); return; }
       setError("Gagal menghapus.");
     }
   };
@@ -132,13 +136,17 @@ export default function AdminAudioPage() {
         </div>
       </header>
 
-      <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4 mb-6 text-sm flex gap-3">
-        <Lock className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
-        <p className="leading-relaxed text-foreground/90">
-          Halaman pengelolaan audio narator. Pada produksi on-premise, lindungi
-          rute ini dengan Basic Auth di Nginx (lihat{" "}
-          <code className="text-xs">DEPLOYMENT.md §12</code>).
-        </p>
+      <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4 mb-6 text-sm flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Lock className="h-4 w-4 shrink-0 text-accent" />
+          <p className="text-foreground/90">Anda masuk sebagai Admin.</p>
+        </div>
+        <button
+          onClick={() => { clearAdminKey(); navigate("/admin/login"); }}
+          className="text-xs text-muted-foreground underline shrink-0"
+        >
+          Keluar
+        </button>
       </div>
 
       {/* Upload form */}

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, UploadFile, File, Form, Header
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -24,6 +24,16 @@ audio_bucket = AsyncIOMotorGridFSBucket(db, bucket_name="audio")
 
 app = FastAPI(title="Rosario API")
 api_router = APIRouter(prefix="/api")
+
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
+
+async def require_admin(x_admin_key: Optional[str] = Header(None)):
+    if not ADMIN_KEY or x_admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=401, detail="Admin key required")
+
+@api_router.get("/admin/verify")
+async def verify_admin(_: None = Depends(require_admin)):
+    return {"ok": True}
 
 
 # ---------- Models ----------
@@ -224,6 +234,7 @@ def _audio_doc_to_meta(doc: dict) -> dict:
 
 @api_router.post("/audio/upload", response_model=AudioMeta)
 async def upload_audio(
+    _: None = Depends(require_admin),
     kind: str = Form(...),
     ref_id: str = Form(...),
     title: Optional[str] = Form(None),
@@ -335,7 +346,7 @@ async def stream_audio(audio_id: str):
 
 
 @api_router.delete("/audio/{audio_id}")
-async def delete_audio(audio_id: str):
+async def delete_audio(audio_id: str, _: None = Depends(require_admin)):
     try:
         oid = ObjectId(audio_id)
     except Exception:
