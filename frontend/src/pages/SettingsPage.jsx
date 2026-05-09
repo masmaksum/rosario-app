@@ -9,22 +9,41 @@ import {
   Bell,
   BellOff,
   Clock,
-  Mic,
-  ChevronRight,
+  Globe,
+  AlignJustify,
 } from "lucide-react";
 import { useSettings, FONT_SIZE_OPTIONS } from "../context/SettingsContext";
 import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
+import { SUPPORTED_LANGUAGES } from "../data/i18n";
 import { requestNotificationPermission } from "../utils/reminder";
+
+// Nama bahasa sesuai UI language aktif
+const LANG_NAMES = {
+  id: { id: "Bahasa Indonesia", jv: "Bahasa Jawa",    en: "English", la: "Lingua Latina" },
+  jv: { id: "Basa Indonésia",  jv: "Basa Jawa",       en: "Basa Inggris", la: "Basa Latin" },
+  en: { id: "Bahasa Indonesia", jv: "Javanese",        en: "English", la: "Latin" },
+  la: { id: "Lingua Indonesiana", jv: "Lingua Iavanica", en: "Lingua Anglica", la: "Lingua Latina" },
+};
 
 export default function SettingsPage() {
   const { settings, update, toggleTheme } = useSettings();
   const { clear } = useProgress();
+  const { language, setLanguage, pattern, setPattern, ui } = useLanguage();
   const [notifStatus, setNotifStatus] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "unsupported"
   );
 
+  const langNames = LANG_NAMES[language] || LANG_NAMES.id;
+  const fontSizeLabels = {
+    small: ui.fontSmall,
+    medium: ui.fontMedium,
+    large: ui.fontLarge,
+    extraLarge: ui.fontExtraLarge,
+  };
+
   const resetProgress = () => {
-    if (window.confirm("Hapus progress doa terakhir?")) {
+    if (window.confirm(ui.clearProgressConfirm)) {
       clear();
     }
   };
@@ -44,20 +63,77 @@ export default function SettingsPage() {
         <Link
           to="/"
           className="h-11 w-11 rounded-full border border-border flex items-center justify-center"
-          aria-label="Kembali"
+          aria-label={ui.back}
           data-testid="settings-back-btn"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            Pengaturan
+            {ui.settings}
           </p>
-          <h1 className="font-serif-display text-3xl mt-0.5">Preferensi Doa</h1>
+          <h1 className="font-serif-display text-3xl mt-0.5">{ui.preferencesTitle}</h1>
         </div>
       </header>
 
       <section className="space-y-3">
+        {/* Language */}
+        <div className="rounded-2xl border border-border p-5 bg-card">
+          <div className="flex items-center gap-3 mb-4">
+            <Globe className="h-5 w-5 text-primary" />
+            <div>
+              <p className="font-medium">{ui.languageSetting}</p>
+              <p className="text-sm text-muted-foreground">{ui.languageSectionSubtitle}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                data-testid={`lang-${lang.code}-btn`}
+                onClick={() => setLanguage(lang.code)}
+                className={`h-12 rounded-xl border transition-all text-sm ${
+                  language === lang.code
+                    ? "border-primary bg-primary/10 text-primary font-medium"
+                    : "border-border text-foreground"
+                }`}
+              >
+                {langNames[lang.code] || lang.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pattern */}
+        <div className="rounded-2xl border border-border p-5 bg-card">
+          <div className="flex items-center gap-3 mb-4">
+            <AlignJustify className="h-5 w-5 text-primary" />
+            <div>
+              <p className="font-medium">{ui.prayerPattern}</p>
+              <p className="text-sm text-muted-foreground">{ui.prayerPatternSubtitle}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { value: "full",   label: ui.fullPattern },
+              { value: "simple", label: ui.simplePattern },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                data-testid={`pattern-${opt.value}-btn`}
+                onClick={() => setPattern(opt.value)}
+                className={`h-12 rounded-xl border transition-all ${
+                  pattern === opt.value
+                    ? "border-primary bg-primary/10 text-primary font-medium"
+                    : "border-border text-foreground"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Theme */}
         <div className="rounded-2xl border border-border p-5 flex items-center justify-between bg-card">
           <div className="flex items-center gap-3">
@@ -67,9 +143,9 @@ export default function SettingsPage() {
               <Sun className="h-5 w-5 text-primary" />
             )}
             <div>
-              <p className="font-medium">Mode Tampilan</p>
+              <p className="font-medium">{ui.appearanceSectionTitle}</p>
               <p className="text-sm text-muted-foreground">
-                {settings.theme === "dark" ? "Gelap" : "Terang"}
+                {settings.theme === "dark" ? ui.darkMode : ui.lightMode}
               </p>
             </div>
           </div>
@@ -78,7 +154,7 @@ export default function SettingsPage() {
             data-testid="toggle-theme-btn"
             className="h-12 px-5 rounded-xl bg-primary text-primary-foreground font-medium"
           >
-            Ubah
+            {ui.change}
           </button>
         </div>
 
@@ -87,8 +163,8 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3 mb-4">
             <Type className="h-5 w-5 text-primary" />
             <div>
-              <p className="font-medium">Ukuran Teks</p>
-              <p className="text-sm text-muted-foreground">Pilih kenyamanan membaca</p>
+              <p className="font-medium">{ui.fontSizeSectionTitle}</p>
+              <p className="text-sm text-muted-foreground">{ui.fontSizeSectionSubtitle}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -103,7 +179,7 @@ export default function SettingsPage() {
                     : "border-border text-foreground"
                 }`}
               >
-                {opt.label}
+                {fontSizeLabels[opt.value] || opt.label}
               </button>
             ))}
           </div>
@@ -119,10 +195,8 @@ export default function SettingsPage() {
                 <BellOff className="h-5 w-5 text-muted-foreground" />
               )}
               <div>
-                <p className="font-medium">Pengingat Doa Harian</p>
-                <p className="text-sm text-muted-foreground">
-                  Pesan lembut sekali sehari
-                </p>
+                <p className="font-medium">{ui.dailyReminderTitle}</p>
+                <p className="text-sm text-muted-foreground">{ui.dailyReminderSubtitle}</p>
               </div>
             </div>
             <button
@@ -146,7 +220,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-3 pt-2 border-t border-border">
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 <label htmlFor="reminder-time" className="text-sm flex-1">
-                  Waktu pengingat
+                  {ui.reminderTimeLabel}
                 </label>
                 <input
                   id="reminder-time"
@@ -158,20 +232,13 @@ export default function SettingsPage() {
                 />
               </div>
               {notifStatus === "denied" && (
-                <p className="text-xs text-destructive">
-                  Notifikasi browser tidak diizinkan. Pengingat hanya akan tampil
-                  sebagai banner di halaman utama.
-                </p>
+                <p className="text-xs text-destructive">{ui.notifDenied}</p>
               )}
               {notifStatus === "granted" && (
-                <p className="text-xs text-muted-foreground">
-                  Notifikasi browser aktif. Pengingat akan tampil saat aplikasi dibuka.
-                </p>
+                <p className="text-xs text-muted-foreground">{ui.notifGranted}</p>
               )}
               {notifStatus === "default" && (
-                <p className="text-xs text-muted-foreground">
-                  Aktifkan sekali lagi untuk meminta izin notifikasi browser.
-                </p>
+                <p className="text-xs text-muted-foreground">{ui.notifDefault}</p>
               )}
             </>
           )}
@@ -180,8 +247,8 @@ export default function SettingsPage() {
         {/* Haptic */}
         <div className="rounded-2xl border border-border p-5 flex items-center justify-between bg-card">
           <div>
-            <p className="font-medium">Getaran Halus</p>
-            <p className="text-sm text-muted-foreground">Saat berpindah manik</p>
+            <p className="font-medium">{ui.gentleVibrationTitle}</p>
+            <p className="text-sm text-muted-foreground">{ui.gentleVibrationSubtitle}</p>
           </div>
           <button
             onClick={() => update({ hapticEnabled: !settings.hapticEnabled })}
@@ -199,8 +266,6 @@ export default function SettingsPage() {
           </button>
         </div>
 
-
-
         {/* Reset progress */}
         <button
           onClick={resetProgress}
@@ -210,15 +275,15 @@ export default function SettingsPage() {
           <div className="flex items-center gap-3">
             <Trash2 className="h-5 w-5" />
             <div className="text-left">
-              <p className="font-medium">Hapus Progress Terakhir</p>
-              <p className="text-sm opacity-80">Mulai ulang dari awal</p>
+              <p className="font-medium">{ui.clearProgressTitle}</p>
+              <p className="text-sm opacity-80">{ui.clearProgressSubtitle}</p>
             </div>
           </div>
         </button>
       </section>
 
       <p className="text-center text-xs text-muted-foreground mt-10">
-        Aplikasi Rosario · Bahasa Indonesia
+        {ui.appName} · {ui.language}
       </p>
     </div>
   );

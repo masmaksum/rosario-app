@@ -2,6 +2,7 @@ import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SettingsProvider } from "./context/SettingsContext";
 import { ProgressProvider } from "./context/ProgressContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import HomePage from "./pages/HomePage";
 import SelectMysteryPage from "./pages/SelectMysteryPage";
 import PrayPage from "./pages/PrayPage";
@@ -16,6 +17,7 @@ import NovenaPlaceholderPage from "./pages/NovenaPlaceholderPage";
 
 function App() {
   return (
+    <LanguageProvider>
     <SettingsProvider>
       <ProgressProvider>
         <div className="App min-h-screen bg-background text-foreground">
@@ -39,6 +41,7 @@ function App() {
         </div>
       </ProgressProvider>
     </SettingsProvider>
+    </LanguageProvider>
   );
 }
 

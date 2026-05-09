@@ -15,6 +15,7 @@ export default function RosaryVisualizer({
   decadeIndex,
   hailMaryIndex,
   completedDecades = 0,
+  mysteryLabel,
 }) {
   const decades = [0, 1, 2, 3, 4];
 
@@ -70,7 +71,7 @@ export default function RosaryVisualizer({
       </div>
       {decadeIndex !== null && (
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Peristiwa {decadeIndex + 1} dari 5
+          {mysteryLabel || `Peristiwa ${decadeIndex + 1} dari 5`}
         </p>
       )}
     </div>

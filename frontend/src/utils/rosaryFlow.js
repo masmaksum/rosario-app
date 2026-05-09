@@ -1,123 +1,116 @@
-// Build the full step-by-step Rosary flow given a selected mystery.
-// Alur mengikuti tata doa Rosario yang lazim di Gereja Katolik Indonesia:
+// Build step-by-step Rosary flow.
 //
-//   Pembukaan:
-//     1. Tanda Salib
-//     2. Intensi Doa  (hanya muncul jika ada intensi, di-skip otomatis jika kosong)
-//     3. Aku Percaya
-//     4. Kemuliaan
-//     5. Terpujilah
-//     6. Bapa Kami
-//     7. Salam Putri Allah Bapa
-//     8. Salam Bunda Allah Putra
-//     9. Salam Mempelai Allah Roh Kudus
-//    10. Kemuliaan
-//    11. Terpujilah
+// pattern = "full"   — pola lengkap (default Indonesia/Jawa)
+// pattern = "simple" — pola ringkas (default Latin/Inggris)
 //
-//   Setiap Peristiwa (×5):
-//    12. Peristiwa — teks Kitab Suci (P) + doa tanggapan (P + U)
-//    13. Bapa Kami
-//    14. 10× Salam Maria
-//    15. Kemuliaan
-//    16. Terpujilah
-//    17. Doa Fatima
-//
-//   Penutup:
-//    18. Salam, Ya Ratu
-//    19. Doa Penutup
-//    20. Tanda Salib
-//
-//   + 1 halaman Selesai.
+// sectionKey diterjemahkan di PrayPage via ui[sectionKey]:
+//   "opening"          — Pembukaan / Opening / Initium / Pambuka
+//   "prayerIntentions" — Intensi Doa / Prayer Intentions / Intentiones
+//   "mysteryOf"        — Peristiwa N dari 5 (dinamis, pakai mysteryEventOrder)
+//   "hailMaryOf"       — Salam Maria N dari 10 (dinamis, pakai hailMaryIndex)
+//   "closing"          — Penutupan / Closing / Conclusio / Panutup
+//   "litany"           — Litani / Litany / Litaniae
+//   "finished"         — Selesai / Finished / Perfectum / Rampung
 
 import { PRAYERS } from "../data/prayers";
 
-export function buildRosarySteps(mystery, starredLitaniIds = []) {
+function makeStep(base) {
+  return { decadeIndex: null, hailMaryIndex: null, ...base };
+}
+
+export function buildRosarySteps(mystery, starredLitaniIds = [], pattern = "full") {
   const steps = [];
-  const none = { decadeIndex: null, hailMaryIndex: null };
+  const isFull = pattern !== "simple";
 
-  // ====== Pembukaan ======
-  steps.push({ type: "prayer",     prayerId: "tanda-salib",    label: "Pembukaan", ...none });
-  // Intensi Doa — langkah ini di-skip otomatis di PrayPage jika tidak ada intensi
-  steps.push({ type: "intentions",                              label: "Intensi Doa", ...none });
-  steps.push({ type: "prayer",     prayerId: "aku-percaya",    label: "Pembukaan", ...none });
-  steps.push({ type: "prayer",     prayerId: "kemuliaan",      label: "Pembukaan", ...none });
-  steps.push({ type: "prayer",     prayerId: "terpujilah",     label: "Pembukaan", ...none });
-  steps.push({ type: "prayer",     prayerId: "bapa-kami",      label: "Pembukaan", ...none });
-  steps.push({ type: "prayer",     prayerId: "salam-putri",    label: "Salam Pembukaan 1 / 3", ...none });
-  steps.push({ type: "prayer",     prayerId: "salam-bunda",    label: "Salam Pembukaan 2 / 3", ...none });
-  steps.push({ type: "prayer",     prayerId: "salam-mempelai", label: "Salam Pembukaan 3 / 3", ...none });
-  steps.push({ type: "prayer",     prayerId: "kemuliaan",      label: "Pembukaan", ...none });
-  steps.push({ type: "prayer",     prayerId: "terpujilah",     label: "Pembukaan", ...none });
+  // ====== Opening ======
+  steps.push(makeStep({ type: "prayer", prayerId: "tanda-salib", sectionKey: "opening" }));
+  steps.push(makeStep({ type: "intentions",                       sectionKey: "prayerIntentions" }));
+  steps.push(makeStep({ type: "prayer", prayerId: "aku-percaya", sectionKey: "opening" }));
 
-  // ====== 5 Peristiwa ======
+  if (isFull) {
+    steps.push(makeStep({ type: "prayer", prayerId: "kemuliaan",  sectionKey: "opening" }));
+    steps.push(makeStep({ type: "prayer", prayerId: "terpujilah", sectionKey: "opening" }));
+  }
+
+  steps.push(makeStep({ type: "prayer", prayerId: "bapa-kami", sectionKey: "opening" }));
+
+  if (isFull) {
+    steps.push(makeStep({ type: "prayer", prayerId: "salam-putri",    sectionKey: "opening" }));
+    steps.push(makeStep({ type: "prayer", prayerId: "salam-bunda",    sectionKey: "opening" }));
+    steps.push(makeStep({ type: "prayer", prayerId: "salam-mempelai", sectionKey: "opening" }));
+    steps.push(makeStep({ type: "prayer", prayerId: "kemuliaan",      sectionKey: "opening" }));
+    steps.push(makeStep({ type: "prayer", prayerId: "terpujilah",     sectionKey: "opening" }));
+  } else {
+    for (let k = 0; k < 3; k++) {
+      steps.push(makeStep({ type: "prayer", prayerId: "salam-maria", sectionKey: "opening" }));
+    }
+    steps.push(makeStep({ type: "prayer", prayerId: "kemuliaan", sectionKey: "opening" }));
+  }
+
+  // ====== 5 Mysteries ======
   mystery.events.forEach((event, idx) => {
     steps.push({
       type: "reflection",
       mysteryEventOrder: event.order,
       eventTitle: event.title,
-      scripture: event.scripture,
-      leaderText: event.leaderText,
-      responseText: event.responseText,
-      label: `Peristiwa ${event.order} dari 5`,
+      fullTitle: event.fullTitle || "",
+      scripture: event.scripture || "",
+      leaderText: event.leaderText || "",
+      responseText: event.responseText || "",
+      sectionKey: "mysteryOf",
       decadeIndex: idx,
       hailMaryIndex: null,
     });
     steps.push({
-      type: "prayer",
-      prayerId: "bapa-kami",
-      label: `Peristiwa ${event.order} — Bapa Kami`,
-      decadeIndex: idx,
-      hailMaryIndex: null,
+      type: "prayer", prayerId: "bapa-kami",
+      sectionKey: "mysteryOf", mysteryEventOrder: event.order,
+      decadeIndex: idx, hailMaryIndex: null,
     });
     for (let i = 1; i <= 10; i++) {
       steps.push({
-        type: "prayer",
-        prayerId: "salam-maria",
-        label: `Salam Maria ${i} dari 10`,
-        decadeIndex: idx,
-        hailMaryIndex: i,
+        type: "prayer", prayerId: "salam-maria",
+        sectionKey: "hailMaryOf",
+        decadeIndex: idx, hailMaryIndex: i,
       });
     }
     steps.push({
-      type: "prayer",
-      prayerId: "kemuliaan",
-      label: `Peristiwa ${event.order} — Kemuliaan`,
-      decadeIndex: idx,
-      hailMaryIndex: null,
+      type: "prayer", prayerId: "kemuliaan",
+      sectionKey: "mysteryOf", mysteryEventOrder: event.order,
+      decadeIndex: idx, hailMaryIndex: null,
     });
+    if (isFull) {
+      steps.push({
+        type: "prayer", prayerId: "terpujilah",
+        sectionKey: "mysteryOf", mysteryEventOrder: event.order,
+        decadeIndex: idx, hailMaryIndex: null,
+      });
+    }
     steps.push({
-      type: "prayer",
-      prayerId: "terpujilah",
-      label: `Peristiwa ${event.order} — Terpujilah`,
-      decadeIndex: idx,
-      hailMaryIndex: null,
-    });
-    steps.push({
-      type: "prayer",
-      prayerId: "doa-fatima",
-      label: `Peristiwa ${event.order} — Doa Fatima`,
-      decadeIndex: idx,
-      hailMaryIndex: null,
+      type: "prayer", prayerId: "doa-fatima",
+      sectionKey: "mysteryOf", mysteryEventOrder: event.order,
+      decadeIndex: idx, hailMaryIndex: null,
     });
   });
 
-  // ====== Penutup ======
-  steps.push({ type: "prayer", prayerId: "salam-ya-ratu",  label: "Penutup", ...none });
-  steps.push({ type: "prayer", prayerId: "marilah-berdoa", label: "Penutup", ...none });
+  // ====== Closing ======
+  steps.push(makeStep({ type: "prayer", prayerId: "salam-ya-ratu",  sectionKey: "closing" }));
+  steps.push(makeStep({ type: "prayer", prayerId: "marilah-berdoa", sectionKey: "closing" }));
   for (const litaniId of starredLitaniIds) {
-    steps.push({ type: "litani", litaniId, label: "Litani", ...none });
+    steps.push(makeStep({ type: "litani", litaniId, sectionKey: "litany" }));
   }
-  steps.push({ type: "prayer", prayerId: "tanda-salib",    label: "Penutup", ...none });
+  steps.push(makeStep({ type: "prayer", prayerId: "tanda-salib", sectionKey: "closing" }));
 
-  // ====== Selesai ======
-  steps.push({ type: "complete", label: "Selesai", ...none });
+  // ====== Complete ======
+  steps.push(makeStep({ type: "complete", sectionKey: "finished" }));
 
   return steps;
 }
 
-export function getPrayerForStep(step) {
+// prayers opsional — fallback ke PRAYERS (bahasa Indonesia)
+export function getPrayerForStep(step, prayers = null) {
   if (!step || step.type !== "prayer") return null;
-  return PRAYERS[step.prayerId];
+  const source = prayers || PRAYERS;
+  return source[step.prayerId] ?? null;
 }
 
 export const DECADE_END_PRAYER_ID = "doa-fatima";

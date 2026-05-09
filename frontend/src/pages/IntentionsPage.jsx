@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2, Heart } from "lucide-react";
 import { useSettings } from "../context/SettingsContext";
+import { useLanguage } from "../context/LanguageContext";
 import {
   listIntentions,
   createIntention,
@@ -10,6 +11,7 @@ import {
 
 export default function IntentionsPage() {
   const { deviceId } = useSettings();
+  const { ui } = useLanguage();
   const [items, setItems] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function IntentionsPage() {
       const data = await listIntentions(deviceId);
       setItems(data);
     } catch (e) {
-      setError("Tidak dapat memuat intensi. Periksa koneksi.");
+      setError(ui.loadIntentionError);
     }
   };
 
@@ -40,19 +42,19 @@ export default function IntentionsPage() {
       setText("");
       await refresh();
     } catch (err) {
-      setError("Tidak dapat menyimpan intensi.");
+      setError(ui.saveIntentionError);
     } finally {
       setLoading(false);
     }
   };
 
   const onDelete = async (id) => {
-    if (!window.confirm("Hapus intensi ini?")) return;
+    if (!window.confirm(ui.deleteIntentionConfirm)) return;
     try {
       await deleteIntention(id);
       await refresh();
     } catch (err) {
-      setError("Tidak dapat menghapus intensi.");
+      setError(ui.deleteIntentionError);
     }
   };
 
@@ -62,29 +64,28 @@ export default function IntentionsPage() {
         <Link
           to="/"
           className="h-11 w-11 rounded-full border border-border flex items-center justify-center"
-          aria-label="Kembali"
+          aria-label={ui.back}
           data-testid="intentions-back-btn"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            Intensi Doa
+            {ui.intentionsTitle}
           </p>
-          <h1 className="font-serif-display text-3xl mt-0.5">Maksud Pribadi</h1>
+          <h1 className="font-serif-display text-3xl mt-0.5">{ui.intentionsPageTitle}</h1>
         </div>
       </header>
 
       <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-        Tuliskan maksud doa pribadi yang ingin engkau bawa dalam Rosario. Intensimu
-        bersifat pribadi dan tersimpan untuk perangkat ini.
+        {ui.intentionsSubtitle}
       </p>
 
       <form onSubmit={onAdd} className="mb-6">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Mis. Untuk kesembuhan ayah, untuk panggilan keluarga..."
+          placeholder={ui.intentionPlaceholder}
           rows={3}
           data-testid="intention-input"
           className="w-full rounded-2xl border border-border bg-card p-4 outline-none focus:border-primary transition-colors resize-none"
@@ -95,7 +96,7 @@ export default function IntentionsPage() {
           data-testid="intention-add-btn"
           className="mt-3 w-full h-14 rounded-2xl bg-primary text-primary-foreground font-medium flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          <Plus className="h-5 w-5" /> Tambah Intensi
+          <Plus className="h-5 w-5" /> {ui.addIntention}
         </button>
       </form>
 
@@ -109,7 +110,7 @@ export default function IntentionsPage() {
         {items.length === 0 && (
           <li className="text-center text-muted-foreground py-12">
             <Heart className="h-8 w-8 mx-auto mb-3 text-accent" />
-            Belum ada intensi. Tuliskan yang pertama di atas.
+            {ui.noIntentions}
           </li>
         )}
         {items.map((it) => (
@@ -123,7 +124,7 @@ export default function IntentionsPage() {
               onClick={() => onDelete(it.id)}
               data-testid={`intention-delete-${it.id}`}
               className="h-10 w-10 rounded-full flex items-center justify-center text-destructive hover:bg-destructive/10"
-              aria-label="Hapus intensi"
+              aria-label={ui.deleteIntention}
             >
               <Trash2 className="h-4 w-4" />
             </button>

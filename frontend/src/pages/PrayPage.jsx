@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, Pause, Heart } from "lucide-react";
-import { getMysteryById } from "../data/mysteries";
+import { useLanguage } from "../context/LanguageContext";
 import { buildRosarySteps, getPrayerForStep, DECADE_END_PRAYER_ID } from "../utils/rosaryFlow";
 import { getLitaniById } from "../data/litani";
 import { useProgress } from "../context/ProgressContext";
@@ -12,12 +12,22 @@ import AudioPlayer from "../components/AudioPlayer";
 import { startSession, completeSession, listAudio, audioStreamUrl, listIntentions } from "../lib/api";
 import { markPrayedToday } from "../utils/reminder";
 
+function getStepLabel(step, t) {
+  if (!step) return "";
+  const key = step.sectionKey;
+  if (!key) return step.label || "";
+  if (key === "hailMaryOf") return t.hailMaryOf(step.hailMaryIndex, 10);
+  if (key === "mysteryOf") return t.mysteryOf(step.mysteryEventOrder, 5);
+  return t[key] || step.label || "";
+}
+
 export default function PrayPage() {
   const { mysteryId } = useParams();
   const navigate = useNavigate();
   const [search] = useSearchParams();
   const fromHome = search.get("from") === "home";
-  const mystery = getMysteryById(mysteryId);
+  const { prayers, ui, pattern, getMysteryById: getLangMystery } = useLanguage();
+  const mystery = getLangMystery(mysteryId);
   const { progress, start, setStep, clear } = useProgress();
   const { haptic, deviceId } = useSettings();
   const [sessionId, setSessionId] = useState(null);
@@ -30,8 +40,8 @@ export default function PrayPage() {
     catch { return []; }
   }, []);
   const steps = useMemo(
-    () => (mystery ? buildRosarySteps(mystery, starredLitani) : []),
-    [mystery, starredLitani]
+    () => (mystery ? buildRosarySteps(mystery, starredLitani, pattern) : []),
+    [mystery, starredLitani, pattern]
   );
 
   useEffect(() => {
@@ -127,7 +137,7 @@ export default function PrayPage() {
 
   const exitWithSave = () => { navigate("/"); };
 
-  const prayer = getPrayerForStep(step);
+  const prayer = getPrayerForStep(step, prayers);
   const litaniData = step?.type === "litani" ? getLitaniById(step.litaniId) : null;
 
   const currentAudio = (() => {
@@ -162,7 +172,7 @@ export default function PrayPage() {
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
             {mystery.name}
           </p>
-          <p className="text-sm font-medium">{step?.label}</p>
+          <p className="text-sm font-medium">{getStepLabel(step, ui)}</p>
         </div>
         <button
           onClick={exitWithSave}
@@ -220,7 +230,7 @@ export default function PrayPage() {
             )}
             {step.hailMaryIndex && (
               <p className="mt-6 text-sm uppercase tracking-[0.2em] text-accent">
-                Salam Maria {step.hailMaryIndex} / 10
+                {ui.hailMaryCount(step.hailMaryIndex)}
               </p>
             )}
             <AudioPlayer src={currentAudio} />
@@ -231,27 +241,37 @@ export default function PrayPage() {
         {step?.type === "reflection" && (
           <article className="max-w-md w-full fade-in" data-testid="reflection-block">
             <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground text-center">
-              Peristiwa {step.mysteryEventOrder} dari 5
+              {ui.decadeLabel(step.mysteryEventOrder)}
             </p>
             <h2 className="font-serif-display text-3xl text-primary mt-2 text-center">
               {step.eventTitle}
             </h2>
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              {step.scripture}
-            </p>
-            <div className="mt-6" data-testid="reflection-leader">
-              <p className="text-xs font-semibold tracking-wider text-primary/80 mb-1">P</p>
-              <p className="leading-relaxed text-foreground/90">{step.leaderText}</p>
-            </div>
-            <div
-              className="mt-6 rounded-2xl border border-accent/40 bg-accent/10 p-4"
-              data-testid="reflection-response"
-            >
-              <p className="text-xs font-semibold tracking-wider text-accent-foreground/80 mb-1">
-                P + U
+            {step.scripture && (
+              <p className="text-center text-sm text-muted-foreground mt-2">
+                {step.scripture}
               </p>
-              <p className="leading-relaxed">{step.responseText}</p>
-            </div>
+            )}
+            {step.leaderText ? (
+              <>
+                <div className="mt-6" data-testid="reflection-leader">
+                  <p className="text-xs font-semibold tracking-wider text-primary/80 mb-1">P</p>
+                  <p className="leading-relaxed text-foreground/90">{step.leaderText}</p>
+                </div>
+                <div
+                  className="mt-6 rounded-2xl border border-accent/40 bg-accent/10 p-4"
+                  data-testid="reflection-response"
+                >
+                  <p className="text-xs font-semibold tracking-wider text-accent-foreground/80 mb-1">
+                    P + U
+                  </p>
+                  <p className="leading-relaxed">{step.responseText}</p>
+                </div>
+              </>
+            ) : (
+              <p className="mt-8 text-center text-muted-foreground italic leading-relaxed" data-testid="reflection-fulltitle">
+                {step.fullTitle || step.eventTitle}
+              </p>
+            )}
             <AudioPlayer src={currentAudio} />
           </article>
         )}
@@ -260,15 +280,10 @@ export default function PrayPage() {
         {step?.type === "intentions" && intentions.length > 0 && (
           <article className="max-w-md w-full fade-in" data-testid="intentions-block">
             <h2 className="font-serif-display text-3xl text-primary text-center mb-6">
-              Intensi Doa
+              {ui.prayerIntentions}
             </h2>
             <p className="leading-relaxed text-foreground/90" style={{ fontSize: "1.0625rem" }}>
-              Bunda Maria, Ratu Rosario, engkau sudi datang ke Fatima, memberitakan kepada
-              tiga anak gembala, harta rahmat yang terkandung dalam doa Rosario.
-              Sudilah membangkitkan dalam hatiku devosi ini, agar dengan merenungkan
-              misteri-misteri penebusan Putera-Mu aku diperkaya dengan hasil buahnya,
-              membawa perdamaian bagi dunia dan pertobatan bagi para pendosa, serta
-              memperoleh anugerah khusus yang kumohon dalam doa Rosario ini…
+              {ui.intentionOpening}
             </p>
             <ul className="mt-5 space-y-3" data-testid="intentions-in-prayer">
               {intentions.map((it) => (
@@ -282,8 +297,7 @@ export default function PrayPage() {
               ))}
             </ul>
             <p className="mt-5 leading-relaxed text-foreground/90" style={{ fontSize: "1.0625rem" }}>
-              Aku mohon semuanya itu demi kemuliaan Allah, untuk menghormat Engkau dan
-              untuk mendapatkan keselamatan jiwa bagiku dan bagi sekalian orang. Amin.
+              {ui.intentionClosing}
             </p>
           </article>
         )}
@@ -349,11 +363,10 @@ export default function PrayPage() {
         {step?.type === "complete" && (
           <article className="max-w-md w-full text-center fade-in" data-testid="complete-block">
             <h2 className="font-serif-display text-4xl text-primary">
-              Rosario Selesai
+              {ui.rosaryFinished}
             </h2>
             <p className="mt-4 text-muted-foreground leading-relaxed">
-              Terima kasih telah meluangkan waktu bersama Bunda Maria. Semoga damai Tuhan
-              menyertaimu sepanjang hari ini.
+              {ui.finishMessage}
             </p>
             <div className="mt-8 grid gap-3">
               <button
@@ -361,14 +374,14 @@ export default function PrayPage() {
                 className="h-14 rounded-2xl bg-primary text-primary-foreground font-medium"
                 data-testid="complete-home-btn"
               >
-                Kembali ke Beranda
+                {ui.backToHome}
               </button>
               <button
                 onClick={() => { clear(); navigate("/pilih-peristiwa"); }}
                 className="h-14 rounded-2xl border-2 border-primary text-primary font-medium"
                 data-testid="complete-pick-btn"
               >
-                Doakan Peristiwa Lain
+                {ui.prayAnotherMystery}
               </button>
             </div>
           </article>
@@ -383,14 +396,14 @@ export default function PrayPage() {
               data-testid="prev-btn"
               className="h-14 rounded-2xl border border-border flex items-center justify-center gap-2 text-foreground disabled:opacity-40 active:scale-[0.98] transition-transform"
             >
-              <ChevronLeft className="h-5 w-5" /> Kembali
+              <ChevronLeft className="h-5 w-5" /> {ui.back}
             </button>
             <button
               onClick={goNext}
               data-testid="next-btn"
               className="h-14 rounded-2xl bg-primary text-primary-foreground font-medium flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-sm"
             >
-              Lanjut <ChevronRight className="h-5 w-5" />
+              {ui.next} <ChevronRight className="h-5 w-5" />
             </button>
           </nav>
         )}
@@ -400,12 +413,13 @@ export default function PrayPage() {
       {showBeads && (
         <div className="shrink-0 px-6 pt-1 pb-4">
           <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1">
-            Langkah {idx + 1} dari {steps.length}
+            {ui.stepOf(idx + 1, steps.length)}
           </p>
           <RosaryVisualizer
             decadeIndex={step?.decadeIndex ?? null}
             hailMaryIndex={step?.hailMaryIndex ?? null}
             completedDecades={completedDecades}
+            mysteryLabel={step?.decadeIndex != null ? ui.mysteryOf(step.decadeIndex + 1, 5) : undefined}
           />
         </div>
       )}
