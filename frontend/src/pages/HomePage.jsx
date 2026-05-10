@@ -142,6 +142,9 @@ export default function HomePage() {
             {recommended.description}
           </p>
         )}
+        <p className="mt-3 text-xs text-muted-foreground/70 italic leading-relaxed">
+          {ui.standardScheduleDisclaimer}
+        </p>
       </section>
 
       <button
